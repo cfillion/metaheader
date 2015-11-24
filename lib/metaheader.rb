@@ -64,13 +64,24 @@ class MetaHeader
       end
     }
 
-    rules.each_pair {|key, key_rule|
-      Array(key_rule).each do |rule|
-        if rule == true
-          if !@data.has_key? key
-            errors[:missing] ||= Array.new
-            errors[:missing] << key
-          end
+    rules.each_pair {|key, rule|
+      if key_errors = validate_key(key, rule)
+        errors.merge! key_errors
+      end
+    }
+
+    errors.empty? ? nil : errors
+  end
+
+  def validate_key(key, rules)
+    errors = Hash.new
+
+    Array(rules).each {|rule|
+      case rule
+      when true
+        if !@data.has_key? key
+          errors[:missing] ||= Array.new
+          errors[:missing] << key
         end
       end
     }
