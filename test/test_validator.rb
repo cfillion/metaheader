@@ -15,14 +15,14 @@ class TestValidator < MiniTest::Test
       :unknown => [
         :hello,
         :chunky,
-      ]
+      ],
     }
 
     assert_equal expected, actual
   end
 
   def test_optional
-    actual = @mh.validate :hello => false, :chunky => false
+    actual = @mh.validate :hello => false, :chunky => nil
 
     assert_nil actual
   end
@@ -33,7 +33,19 @@ class TestValidator < MiniTest::Test
     expected = {
       :missing => [
         :version,
-      ]
+      ],
+    }
+
+    assert_equal expected, actual
+  end
+
+  def test_regex
+    actual = @mh.validate :hello => /\d+/, :chunky => nil
+
+    expected = {
+      :invalid => [
+        :hello,
+      ],
     }
 
     assert_equal expected, actual

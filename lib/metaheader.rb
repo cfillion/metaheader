@@ -73,18 +73,25 @@ class MetaHeader
     errors.empty? ? nil : errors
   end
 
-  def validate_key(key, rules)
+  def validate_key(key, rule)
+    return unless rule
+
     errors = Hash.new
 
-    Array(rules).each {|rule|
-      case rule
-      when true
-        if !@data.has_key? key
-          errors[:missing] ||= Array.new
-          errors[:missing] << key
-        end
+    case rule
+    when true
+      if !@data.has_key? key
+        errors[:missing] ||= Array.new
+        errors[:missing] << key
       end
-    }
+    when Regexp
+      if !rule.match(@data[key])
+        errors[:invalid] ||= Array.new
+        errors[:invalid] << key
+      end
+    else
+      raise ArgumentError
+    end
 
     errors.empty? ? nil : errors
   end
