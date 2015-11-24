@@ -50,4 +50,23 @@ class TestMetaHeader < MiniTest::Test
     assert_equal 'world', mh[:hello]
     assert_equal 'bacon', mh[:chunky]
   end
+
+  def test_multiline_value
+    mh = MetaHeader.new <<-IN
+    @test Lorem
+      Ipsum
+    IN
+
+    assert_equal "Lorem\nIpsum", mh[:test]
+  end
+
+  def test_multiline_value_variant
+    mh = MetaHeader.new <<-IN
+    @test
+      Lorem
+      Ipsum
+    IN
+
+    assert_equal "Lorem\nIpsum", mh[:test]
+  end
 end
