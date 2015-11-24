@@ -3,6 +3,9 @@
 require 'metaheader/version'
 
 class MetaHeader
+  REQUIRED = 1
+  OPTIONAL = 2
+
   REGEX = /\A.*?@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
 
   def self.from_file(file)
@@ -49,5 +52,29 @@ class MetaHeader
 
   def size
     @data.size
+  end
+
+  def validate(rules)
+    errors = Hash.new
+
+    @data.each_pair {|key, value|
+      unless rules.has_key? key
+        errors[:unknown] ||= Array.new
+        errors[:unknown] << key
+      end
+    }
+
+    rules.each_pair {|key, key_rule|
+      Array(key_rule).each do |rule|
+        if rule == true
+          if !@data.has_key? key
+            errors[:missing] ||= Array.new
+            errors[:missing] << key
+          end
+        end
+      end
+    }
+
+    errors.empty? ? nil : errors
   end
 end
