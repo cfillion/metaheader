@@ -3,7 +3,9 @@ require File.expand_path '../helper', __FILE__
 class TestMetaHeader < MiniTest::Test
   def test_basic_parser
     mh = MetaHeader.new '@hello world'
+
     assert_equal 'world', mh[:hello]
+    assert_equal 1, mh.size
   end
 
   def test_unrequired_value
@@ -24,6 +26,7 @@ class TestMetaHeader < MiniTest::Test
 
     assert_equal 'world', mh[:hello]
     assert_equal 'bacon', mh[:chunky]
+    assert_equal 2, mh.size
   end
 
   def test_break_empty_line
@@ -49,6 +52,7 @@ class TestMetaHeader < MiniTest::Test
 
     assert_equal 'world', mh[:hello]
     assert_equal 'bacon', mh[:chunky]
+    assert_equal 2, mh.size
   end
 
   def test_multiline_value
@@ -58,6 +62,7 @@ class TestMetaHeader < MiniTest::Test
     IN
 
     assert_equal "Lorem\nIpsum", mh[:test]
+    assert_equal 1, mh.size
   end
 
   def test_multiline_value_variant
@@ -70,15 +75,11 @@ class TestMetaHeader < MiniTest::Test
     assert_equal "Lorem\nIpsum", mh[:test]
   end
 
-  def test_default_key
-    mh = MetaHeader.new "Hello World"
-
-    assert_equal 'Hello World', mh[:desc]
-  end
-
-  def test_default_key_custom
-    mh = MetaHeader.new 'Hello World', :test
+  def test_read_file
+    path = File.expand_path '../../lib/metaheader.rb', __FILE__
+    mh = MetaHeader.from_file path
 
     assert_equal 'Hello World', mh[:test]
+    assert_equal 1, mh.size
   end
 end
