@@ -7,11 +7,11 @@ class MetaHeader
     self.new nil
   end
 
-  def initialize(input)
+  def initialize(input, default_key = :desc)
     @data = {}
 
-    last_key = nil
-    last_index = 0
+    last_key = default_key
+    last_index = -1
 
     input.each_line {|input|
       line = input.strip

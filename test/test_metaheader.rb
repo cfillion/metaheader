@@ -69,4 +69,16 @@ class TestMetaHeader < MiniTest::Test
 
     assert_equal "Lorem\nIpsum", mh[:test]
   end
+
+  def test_default_key
+    mh = MetaHeader.new "Hello World"
+
+    assert_equal 'Hello World', mh[:desc]
+  end
+
+  def test_default_key_custom
+    mh = MetaHeader.new 'Hello World', :test
+
+    assert_equal 'Hello World', mh[:test]
+  end
 end
