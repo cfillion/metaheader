@@ -1,6 +1,6 @@
 require File.expand_path '../helper', __FILE__
 
-class TestMetaHeader < MiniTest::Test
+class TestParser < MiniTest::Test
   def test_basic_parser
     mh = MetaHeader.new '@hello world'
 
