@@ -82,4 +82,11 @@ class TestParser < MiniTest::Test
     assert_equal 'Hello World', mh[:test]
     assert_equal 1, mh.size
   end
+
+  def test_to_hash
+    mh = MetaHeader.new '@key value'
+    expected = {:key => 'value'}
+
+    assert_equal expected, mh.to_h
+  end
 end

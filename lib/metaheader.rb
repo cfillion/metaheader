@@ -61,6 +61,10 @@ class MetaHeader
     @data.size
   end
 
+  def to_h
+    @data.dup
+  end
+
   def validate(rules)
     errors = Hash.new
 
