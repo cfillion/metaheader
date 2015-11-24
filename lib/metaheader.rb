@@ -9,7 +9,14 @@ class MetaHeader
   REGEX = /\A.*?@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
 
   def self.from_file(file)
-    self.new File.read(file)
+    input = String.new
+
+    File.foreach(file) {|line|
+      break if line.strip.empty?
+      input << line
+    }
+
+    self.new input
   end
 
   def initialize(input)
