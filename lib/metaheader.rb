@@ -1,7 +1,7 @@
 require 'metaheader/version'
 
 class MetaHeader
-  REGEX = /@(\w+)\s+([^$]+)/.freeze
+  REGEX = /\A.*?@(\w+)(?:\s+([^\n]+))?\Z/.freeze
 
   def self.from_file(file)
     self.new nil
@@ -12,7 +12,7 @@ class MetaHeader
 
     input.each_line {|line|
       break unless line =~ REGEX
-      @data[$1.to_sym] = $2
+      @data[$1.to_sym] = $2 || true
     }
   end
 
