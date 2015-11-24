@@ -25,4 +25,29 @@ class TestMetaHeader < MiniTest::Test
     assert_equal 'world', mh[:hello]
     assert_equal 'bacon', mh[:chunky]
   end
+
+  def test_break_empty_line
+    mh = MetaHeader.new <<-IN
+    -- @hello world
+
+    @chunky bacon
+    IN
+
+    assert_equal 'world', mh[:hello]
+    assert_nil mh[:chunky]
+  end
+
+  def test_ignore_c_comment_tokens
+    mh = MetaHeader.new <<-IN
+/*
+    -- @hello world
+*/
+/*
+    @chunky bacon
+*/
+    IN
+
+    assert_equal 'world', mh[:hello]
+    assert_equal 'bacon', mh[:chunky]
+  end
 end

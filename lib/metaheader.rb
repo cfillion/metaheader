@@ -11,7 +11,9 @@ class MetaHeader
     @data = {}
 
     input.each_line {|line|
-      break unless line =~ REGEX
+      break if line.strip.empty?
+      next unless line =~ REGEX
+
       @data[$1.to_sym] = $2 || true
     }
   end
