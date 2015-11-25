@@ -50,4 +50,10 @@ class TestValidator < MiniTest::Test
 
     assert_equal expected, actual
   end
+
+  def test_invalid_rule
+    assert_raises ArgumentError do
+      @mh.validate_key :hello, :hello => Object.new
+    end
+  end
 end
