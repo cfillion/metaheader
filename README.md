@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/cfillion/metaheader.svg?branch=master)](https://travis-ci.org/cfillion/metaheader)
 [![Coverage Status](https://coveralls.io/repos/cfillion/metaheader/badge.svg?branch=master&service=github)](https://coveralls.io/github/cfillion/metaheader?branch=master)
-[![Dependency Status](https://gemnasium.com/cfillion/metaheader.svg)](https://gemnasium.com/cfillion/metaheader)
 
 ## Syntax
 
@@ -37,11 +36,11 @@ mh = MetaHeader.new input
 # alternatively:
 # mh = MetaHeader.from_file path
 
-# set @key as not required
-errors = mh.validate :key => nil
+# set @key as optional
+errors = mh.validate :key => MetaHeader::OPTIONAL
 
 # or set @key as required:
-# mh.validate :key => true
+# mh.validate :key => MetaHeader::REQUIRED
 #
 # ensure @key contains a valid value with a regex
 # mh.validate :key => /^\w{2,}$/
