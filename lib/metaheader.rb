@@ -25,9 +25,9 @@ class MetaHeader
     last_key = nil
     last_index = 0
 
-    input.each_line {|input|
-      line = input.strip
-      line_start = input.index line
+    input.each_line {|rawline|
+      line = rawline.strip
+      line_start = rawline.index line
 
       break if line.empty?
 
@@ -68,7 +68,7 @@ class MetaHeader
   def validate(rules)
     errors = Hash.new
 
-    @data.each_pair {|key, value|
+    @data.each_key {|key|
       unless rules.has_key? key
         errors[:unknown] ||= Array.new
         errors[:unknown] << key
