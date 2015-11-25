@@ -3,8 +3,8 @@
 require 'metaheader/version'
 
 class MetaHeader
-  REQUIRED = 1
-  OPTIONAL = 2
+  REQUIRED = true
+  OPTIONAL = nil
 
   REGEX = /\A.*?@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
 
