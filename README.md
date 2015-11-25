@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/cfillion/metaheader.svg?branch=master)](https://travis-ci.org/cfillion/metaheader)
 [![Coverage Status](https://coveralls.io/repos/cfillion/metaheader/badge.svg?branch=master&service=github)](https://coveralls.io/github/cfillion/metaheader?branch=master)
+[![Dependency Status](https://gemnasium.com/cfillion/metaheader.svg)](https://gemnasium.com/cfillion/metaheader)
 
 ## Syntax
 
