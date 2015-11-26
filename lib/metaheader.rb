@@ -6,7 +6,7 @@ class MetaHeader
   REQUIRED = true
   OPTIONAL = nil
 
-  REGEX = /\A.*?@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
+  REGEX = /\A(?<prefix>.*?)@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
 
   def self.from_file(file)
     input = String.new
@@ -23,31 +23,34 @@ class MetaHeader
     @data = {}
 
     last_key = nil
-    last_index = 0
+    last_prefix = String.new
 
-    input.each_line {|rawline|
-      line = rawline.strip
-      line_start = rawline.index line
-
-      break if line.empty?
+    input.each_line {|line|
+      break if line.strip.empty?
 
       unless match = REGEX.match(line)
-        # multiline value
-        if line_start - last_index >= 0 && last_key
+        # multiline value must have the same prefix
+        next unless line.index(last_prefix) == 0
+
+        # remove the line prefix
+        line = line[last_prefix.size..-1]
+        stripped = line.strip
+
+        if last_key && line.index(stripped) > 0
           if @data[last_key].is_a? String
             @data[last_key] += "\n"
           else
             @data[last_key] = String.new
           end
 
-          @data[last_key] += line
+          @data[last_key] += stripped
         end
 
         next
       end
 
+      last_prefix = match[:prefix]
       last_key = match[:key].to_sym
-      last_index = line_start + match.begin(:key) - 1
 
       @data[last_key] = match[:value] || true
     }

@@ -55,7 +55,7 @@ class TestParser < MiniTest::Test
     assert_equal 2, mh.size
   end
 
-  def test_multiline_value
+  def test_multiline
     mh = MetaHeader.new <<-IN
     @test Lorem
       Ipsum
@@ -65,7 +65,7 @@ class TestParser < MiniTest::Test
     assert_equal 1, mh.size
   end
 
-  def test_multiline_value_variant
+  def test_multiline_variant
     mh = MetaHeader.new <<-IN
     @test
       Lorem
@@ -75,6 +75,25 @@ class TestParser < MiniTest::Test
     assert_equal "Lorem\nIpsum", mh[:test]
   end
 
+  def test_multiline_prefix
+    mh = MetaHeader.new <<-IN
+--    @test Lorem
+--      Ipsum
+    IN
+
+    assert_equal "Lorem\nIpsum", mh[:test]
+    assert_equal 1, mh.size
+  end
+
+  def test_multiline_wrong_indent
+    mh = MetaHeader.new <<-IN
+    @test Lorem
+    Ipsum
+    IN
+
+    assert_equal 1, mh.size
+    assert_equal "Lorem", mh[:test]
+  end
   def test_read_file
     path = File.expand_path '../../lib/metaheader.rb', __FILE__
     mh = MetaHeader.from_file path
