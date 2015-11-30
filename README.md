@@ -15,12 +15,18 @@
 @key
 ```
 
-Any kind of comment syntax or prefix is supported:
+Any kind of comment syntax or prefix can be used:
 
 ```cpp
 /*
  * @key value
  */
+```
+
+An alternative syntax is also supported:
+
+```
+Key Name: Value
 ```
 
 Parsing stops at the first empty line (ignoring white space).
@@ -35,6 +41,9 @@ mh = MetaHeader.new input
 
 # alternatively:
 # mh = MetaHeader.from_file path
+
+# mark unknown keys as invalid
+# mh.strict = true
 
 # set @key as optional
 errors = mh.validate :key => MetaHeader::OPTIONAL
