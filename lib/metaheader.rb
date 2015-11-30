@@ -6,7 +6,10 @@ class MetaHeader
   REQUIRED = true
   OPTIONAL = nil
 
-  REGEX = /\A(?<prefix>.*?)@(?<key>\w+)(?:\s+(?<value>[^\n]+))?\Z/.freeze
+  REGEX = /\A(?<prefix>.*?)
+    (?:@(?<key>\w+)|(?<key>[^:]+)\s*:)
+    (?:\s+(?<value>[^\n]+))?
+    \Z/x.freeze
 
   def self.from_file(file)
     input = String.new
