@@ -6,6 +6,8 @@ class MetaHeader
   REQUIRED = true
   OPTIONAL = nil
 
+  attr_accessor :strict
+
   REGEX = /\A(?<prefix>.*?)
     (?:@(?<key>\w+)|(?<key>[^:]+)\s*:)
     (?:\s+(?<value>[^\n]+))?
@@ -23,6 +25,7 @@ class MetaHeader
   end
 
   def initialize(input)
+    @strict = true
     @data = {}
 
     last_key = nil
@@ -74,12 +77,14 @@ class MetaHeader
   def validate(rules)
     errors = Hash.new
 
-    @data.each_key {|key|
-      unless rules.has_key? key
-        errors[:unknown] ||= Array.new
-        errors[:unknown] << key
-      end
-    }
+    if @strict
+      @data.each_key {|key|
+        unless rules.has_key? key
+          errors[:unknown] ||= Array.new
+          errors[:unknown] << key
+        end
+      }
+    end
 
     rules.each_pair {|key, rule|
       if key_errors = validate_key(key, rule)
