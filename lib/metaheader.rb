@@ -9,7 +9,7 @@ class MetaHeader
   attr_accessor :strict
 
   REGEX = /\A(?<prefix>.*?)
-    (?:@(?<key>\w+)|(?<key>[^:]+)\s*:)
+    (?:@(?<key>\w+)|(?<key>[\w\s]+)\s*:)
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
@@ -56,7 +56,7 @@ class MetaHeader
       end
 
       last_prefix = match[:prefix]
-      last_key = match[:key].to_sym
+      last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
 
       @data[last_key] = match[:value] || true
     }
