@@ -9,7 +9,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_unknown_strict
-    assert @mh.strict
+    @mh.strict = true
     actual = @mh.validate Hash.new
 
     expected = {
@@ -23,7 +23,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_unknown_tolerant
-    @mh.strict = false
+    refute @mh.strict
     actual = @mh.validate Hash.new
 
     assert_nil actual

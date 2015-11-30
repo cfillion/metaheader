@@ -25,7 +25,7 @@ class MetaHeader
   end
 
   def initialize(input)
-    @strict = true
+    @strict = false
     @data = {}
 
     last_key = nil
