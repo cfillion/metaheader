@@ -115,4 +115,11 @@ class TestParser < MiniTest::Test
 
     assert_equal expected, mh.to_h
   end
+
+  def test_alternate_syntax_prefix
+    mh = MetaHeader.new '-- Key Test: Value'
+    expected = {:key_test => 'Value'}
+
+    assert_equal expected, mh.to_h
+  end
 end
