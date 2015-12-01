@@ -95,6 +95,17 @@ class TestParser < MiniTest::Test
     assert_equal "Lorem", mh[:test]
   end
 
+  def test_multiline_sub_alternate_syntax
+    mh = MetaHeader.new <<-IN
+    @test Lorem
+      Ipsum:
+      Dolor: sit amet
+    IN
+
+    assert_equal "Lorem\nIpsum:\nDolor: sit amet", mh[:test]
+    assert_equal 1, mh.size
+  end
+
   def test_read_file
     path = File.expand_path '../../lib/metaheader.rb', __FILE__
     mh = MetaHeader.from_file path

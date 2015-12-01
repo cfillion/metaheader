@@ -28,38 +28,47 @@ class MetaHeader
     @strict = false
     @data = {}
 
-    last_key = nil
-    last_prefix = String.new
+    @last_key = nil
+    @last_prefix = String.new
 
     input.each_line {|line|
-      break if line.strip.empty?
+      if line.strip.empty?
+        break
+      else
+        self.<< line
+      end
+    }
+  end
 
-      unless match = REGEX.match(line)
-        # multiline value must have the same prefix
-        next unless line.index(last_prefix) == 0
+  def <<(line)
+    # multiline value must have the same prefix
+    if @last_key && line.index(@last_prefix) == 0
+      # remove the line prefix
+      mline = line[@last_prefix.size..-1]
+      stripped = mline.strip
 
-        # remove the line prefix
-        line = line[last_prefix.size..-1]
-        stripped = line.strip
+      indent_level = mline.index stripped
 
-        if last_key && line.index(stripped) > 0
-          if @data[last_key].is_a? String
-            @data[last_key] += "\n"
-          else
-            @data[last_key] = String.new
-          end
-
-          @data[last_key] += stripped
+      if indent_level > 0
+        if @data[@last_key].is_a? String
+          @data[@last_key] += "\n"
+        else
+          @data[@last_key] = String.new
         end
 
-        next
+        @data[@last_key] += stripped
+
+        return
       end
+    end
 
-      last_prefix = match[:prefix]
-      last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
+    return unless match = REGEX.match(line)
 
-      @data[last_key] = match[:value] || true
-    }
+    # single line
+    @last_prefix = match[:prefix]
+    @last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
+
+    @data[@last_key] = match[:value] || true
   end
 
   def [](key)
