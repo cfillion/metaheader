@@ -81,6 +81,19 @@ class TestValidator < MiniTest::Test
     assert_nil actual
   end
 
+  def test_regex_no_value
+    @mh = MetaHeader.new '@hello'
+    actual = @mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
+
+    expected = {
+      :invalid => [
+        :hello,
+      ],
+    }
+
+    assert_equal expected, actual
+  end
+
   def test_invalid_rule
     assert_raises ArgumentError do
       @mh.validate_key :hello, :hello => Object.new

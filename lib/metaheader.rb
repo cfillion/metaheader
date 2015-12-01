@@ -112,12 +112,15 @@ class MetaHeader
       return errors
     end
 
+    value = @data[key]
+    value = String.new if value == true
+
     rules.each {|rule|
       case rule
       when REQUIRED, OPTIONAL
         # do nothing
       when Regexp
-        if !rule.match(@data[key])
+        unless rule.match value
           errors[:invalid] ||= Array.new
           errors[:invalid] << key
         end
