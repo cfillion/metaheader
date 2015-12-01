@@ -30,13 +30,15 @@ class TestValidator < MiniTest::Test
   end
 
   def test_optional
-    actual = @mh.validate :hello => false, :chunky => nil
+    actual = @mh.validate :hello => MetaHeader::OPTIONAL,
+      :chunky => MetaHeader::OPTIONAL
 
     assert_nil actual
   end
 
   def test_required
-    actual = @mh.validate :version => true, :hello => false, :chunky => false
+    actual = @mh.validate :version => MetaHeader::REQUIRED,
+      :hello => MetaHeader::OPTIONAL, :chunky => MetaHeader::OPTIONAL
 
     expected = {
       :missing => [
@@ -48,7 +50,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_regex
-    actual = @mh.validate :hello => /\d+/, :chunky => nil
+    actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
 
     expected = {
       :invalid => [
@@ -57,6 +59,26 @@ class TestValidator < MiniTest::Test
     }
 
     assert_equal expected, actual
+  end
+
+  def test_regex_missing
+    actual = @mh.validate :version => /\d+/,
+      :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
+
+    expected = {
+      :missing => [
+        :version,
+      ],
+    }
+
+    assert_equal expected, actual
+  end
+
+  def test_regex_optional
+    actual = @mh.validate :version => [MetaHeader::OPTIONAL, /\d+/],
+      :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
+
+    assert_nil actual
   end
 
   def test_invalid_rule

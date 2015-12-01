@@ -3,8 +3,8 @@
 require 'metaheader/version'
 
 class MetaHeader
-  REQUIRED = true
-  OPTIONAL = nil
+  REQUIRED = Object.new.freeze
+  OPTIONAL = Object.new.freeze
 
   attr_accessor :strict
 
@@ -99,25 +99,32 @@ class MetaHeader
     errors.empty? ? nil : errors
   end
 
-  def validate_key(key, rule)
-    return unless rule
+  def validate_key(key, rules)
+    rules = Array(rules)
+    return if rules.empty?
 
     errors = Hash.new
 
-    case rule
-    when true
-      if !@data.has_key? key
-        errors[:missing] ||= Array.new
-        errors[:missing] << key
-      end
-    when Regexp
-      if !rule.match(@data[key])
-        errors[:invalid] ||= Array.new
-        errors[:invalid] << key
-      end
-    else
-      raise ArgumentError
+    unless @data.has_key? key
+      return if rules.include? OPTIONAL
+      errors[:missing] ||= Array.new
+      errors[:missing] << key
+      return errors
     end
+
+    rules.each {|rule|
+      case rule
+      when REQUIRED, OPTIONAL
+        # do nothing
+      when Regexp
+        if !rule.match(@data[key])
+          errors[:invalid] ||= Array.new
+          errors[:invalid] << key
+        end
+      else
+        raise ArgumentError
+      end
+    }
 
     errors.empty? ? nil : errors
   end
