@@ -89,6 +89,7 @@ class TestParser < MiniTest::Test
     mh = MetaHeader.new <<-IN
     @test Lorem
     Ipsum
+      Test
     IN
 
     assert_equal 1, mh.size

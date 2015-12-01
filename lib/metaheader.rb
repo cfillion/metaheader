@@ -59,6 +59,8 @@ class MetaHeader
         @data[@last_key] += stripped
 
         return
+      else
+        @last_key = nil
       end
     end
 
