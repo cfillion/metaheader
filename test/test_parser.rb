@@ -94,6 +94,7 @@ class TestParser < MiniTest::Test
     assert_equal 1, mh.size
     assert_equal "Lorem", mh[:test]
   end
+
   def test_read_file
     path = File.expand_path '../../lib/metaheader.rb', __FILE__
     mh = MetaHeader.from_file path
@@ -121,5 +122,12 @@ class TestParser < MiniTest::Test
     expected = {:key_test => 'Value'}
 
     assert_equal expected, mh.to_h
+  end
+
+  def test_inspect
+    mh = MetaHeader.new '@hello world'
+    expected = {:hello => 'world'}
+
+    assert_equal expected.inspect, mh.inspect
   end
 end
