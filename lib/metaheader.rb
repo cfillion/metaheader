@@ -9,7 +9,7 @@ class MetaHeader
   attr_accessor :strict
 
   REGEX = /\A(?<prefix>.*?)
-    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*)\s*:)
+    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
