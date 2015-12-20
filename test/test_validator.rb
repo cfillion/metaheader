@@ -12,12 +12,10 @@ class TestValidator < MiniTest::Test
     @mh.strict = true
     actual = @mh.validate Hash.new
 
-    expected = {
-      :unknown => [
-        :hello,
-        :chunky,
-      ],
-    }
+    expected = [
+      'unknown tag @hello',
+      'unknown tag @chunky',
+    ]
 
     assert_equal expected, actual
   end
@@ -40,11 +38,9 @@ class TestValidator < MiniTest::Test
     actual = @mh.validate :version => MetaHeader::REQUIRED,
       :hello => MetaHeader::OPTIONAL, :chunky => MetaHeader::OPTIONAL
 
-    expected = {
-      :missing => [
-        :version,
-      ],
-    }
+    expected = [
+      'missing tag @version',
+    ]
 
     assert_equal expected, actual
   end
@@ -52,11 +48,9 @@ class TestValidator < MiniTest::Test
   def test_regex
     actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
 
-    expected = {
-      :invalid => [
-        :hello,
-      ],
-    }
+    expected = [
+      'invalid value for tag @hello',
+    ]
 
     assert_equal expected, actual
   end
@@ -65,11 +59,9 @@ class TestValidator < MiniTest::Test
     actual = @mh.validate :version => /\d+/,
       :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
 
-    expected = {
-      :missing => [
-        :version,
-      ],
-    }
+    expected = [
+      'missing tag @version',
+    ]
 
     assert_equal expected, actual
   end
@@ -85,11 +77,9 @@ class TestValidator < MiniTest::Test
     @mh = MetaHeader.new '@hello'
     actual = @mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
 
-    expected = {
-      :invalid => [
-        :hello,
-      ],
-    }
+    expected = [
+      'invalid value for tag @hello',
+    ]
 
     assert_equal expected, actual
   end

@@ -90,20 +90,17 @@ class MetaHeader
   end
 
   def validate(rules)
-    errors = Hash.new
+    errors = Array.new
 
     if @strict
       @data.each_key {|key|
-        unless rules.has_key? key
-          errors[:unknown] ||= Array.new
-          errors[:unknown] << key
-        end
+        errors << "unknown tag #{format key}" unless rules.has_key? key
       }
     end
 
     rules.each_pair {|key, rule|
       if key_errors = validate_key(key, rule)
-        errors.merge! key_errors
+        errors.concat key_errors
       end
     }
 
@@ -114,13 +111,14 @@ class MetaHeader
     rules = Array(rules)
     return if rules.empty?
 
-    errors = Hash.new
+    errors = Array.new
 
     unless @data.has_key? key
-      return if rules.include? OPTIONAL
-      errors[:missing] ||= Array.new
-      errors[:missing] << key
-      return errors
+      if rules.include? OPTIONAL
+        return nil
+      else
+        return ["missing tag #{format key}"]
+      end
     end
 
     value = @data[key]
@@ -132,8 +130,7 @@ class MetaHeader
         # do nothing
       when Regexp
         unless rule.match value
-          errors[:invalid] ||= Array.new
-          errors[:invalid] << key
+          errors << "invalid value for tag #{format key}"
         end
       else
         raise ArgumentError
@@ -141,5 +138,9 @@ class MetaHeader
     }
 
     errors.empty? ? nil : errors
+  end
+
+  def format(key)
+    "@#{key}"
   end
 end
