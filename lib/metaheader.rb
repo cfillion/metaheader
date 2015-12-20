@@ -132,6 +132,10 @@ class MetaHeader
         unless rule.match value
           errors << "invalid value for tag #{format key}"
         end
+      when Proc
+        if error = rule[value]
+          errors << "invalid value for tag #{format key}: #{error}"
+        end
       else
         raise ArgumentError
       end

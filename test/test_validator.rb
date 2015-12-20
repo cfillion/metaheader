@@ -84,6 +84,18 @@ class TestValidator < MiniTest::Test
     assert_equal expected, actual
   end
 
+  def test_custom_validator
+    valid = @mh.validate :hello => Proc.new {|value| value == 'world' && nil }
+    assert_nil valid
+
+    expected = [
+      'invalid value for tag @hello: Hello World!',
+    ]
+
+    invalid = @mh.validate :hello => Proc.new {|value| 'Hello World!' }
+    assert_equal expected, invalid
+  end
+
   def test_invalid_rule
     assert_raises ArgumentError do
       @mh.validate_key :hello, :hello => Object.new
