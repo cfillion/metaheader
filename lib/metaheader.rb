@@ -11,7 +11,7 @@ class MetaHeader
   attr_accessor :strict
 
   REGEX = /\A(?<prefix>.*?)
-    (?<name>@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
+    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
@@ -75,7 +75,7 @@ class MetaHeader
     @last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
 
     value = match[:value] || true
-    @data[@last_key] = Tag.new match[:name].freeze, value
+    @data[@last_key] = Tag.new match[:key].freeze, value
   end
 
   def [](key)
@@ -99,7 +99,7 @@ class MetaHeader
 
     if @strict
       @data.each_key {|key|
-        errors << "unknown tag @%s" % key unless rules.has_key? key
+        errors << 'unknown tag "%s"' % key unless rules.has_key? key
       }
     end
 
@@ -122,7 +122,7 @@ class MetaHeader
       if rules.include? OPTIONAL
         return nil
       else
-        return ["missing tag @%s" % key]
+        return ['missing tag "%s"' % key]
       end
     end
 
