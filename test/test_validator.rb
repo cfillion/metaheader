@@ -49,7 +49,18 @@ class TestValidator < MiniTest::Test
     actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
 
     expected = [
-      'invalid value for tag @hello',
+      'invalid value for tag "@hello"',
+    ]
+
+    assert_equal expected, actual
+  end
+
+  def test_use_original_format
+    @mh = MetaHeader.new 'HeLlO: world'
+    actual = @mh.validate :hello => /\d+/
+
+    expected = [
+      'invalid value for tag "HeLlO:"',
     ]
 
     assert_equal expected, actual
@@ -78,7 +89,7 @@ class TestValidator < MiniTest::Test
     actual = @mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
 
     expected = [
-      'invalid value for tag @hello',
+      'invalid value for tag "@hello"',
     ]
 
     assert_equal expected, actual
@@ -89,7 +100,7 @@ class TestValidator < MiniTest::Test
     assert_nil valid
 
     expected = [
-      'invalid value for tag @hello: Hello World!',
+      'invalid value for tag "@hello": Hello World!',
     ]
 
     invalid = @mh.validate :hello => Proc.new {|value| 'Hello World!' }

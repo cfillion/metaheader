@@ -6,10 +6,12 @@ class MetaHeader
   REQUIRED = Object.new.freeze
   OPTIONAL = Object.new.freeze
 
+  Tag = Struct.new :name, :value
+
   attr_accessor :strict
 
   REGEX = /\A(?<prefix>.*?)
-    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
+    (?<name>@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
@@ -50,13 +52,15 @@ class MetaHeader
       indent_level = mline.index stripped
 
       if indent_level > 0
-        if @data[@last_key].is_a? String
-          @data[@last_key] += "\n"
+        tag = @data[@last_key]
+
+        if tag.value.is_a? String
+          tag.value += "\n"
         else
-          @data[@last_key] = String.new
+          tag.value = String.new
         end
 
-        @data[@last_key] += stripped
+        tag.value += stripped
 
         return
       else
@@ -70,11 +74,12 @@ class MetaHeader
     @last_prefix = match[:prefix]
     @last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
 
-    @data[@last_key] = match[:value] || true
+    value = match[:value] || true
+    @data[@last_key] = Tag.new match[:name].freeze, value
   end
 
   def [](key)
-    @data[key]
+    tag = @data[key] and tag.value
   end
 
   def size
@@ -82,11 +87,11 @@ class MetaHeader
   end
 
   def to_h
-    @data.dup
+    Hash[@data.map {|v| [v.first, v.last.value] }]
   end
 
   def inspect
-    @data.inspect
+    to_h.inspect
   end
 
   def validate(rules)
@@ -94,7 +99,7 @@ class MetaHeader
 
     if @strict
       @data.each_key {|key|
-        errors << "unknown tag #{format key}" unless rules.has_key? key
+        errors << "unknown tag @%s" % key unless rules.has_key? key
       }
     end
 
@@ -117,11 +122,12 @@ class MetaHeader
       if rules.include? OPTIONAL
         return nil
       else
-        return ["missing tag #{format key}"]
+        return ["missing tag @%s" % key]
       end
     end
 
-    value = @data[key]
+    tag = @data[key]
+    value = tag.value
     value = String.new if value == true
 
     rules.each {|rule|
@@ -130,11 +136,11 @@ class MetaHeader
         # do nothing
       when Regexp
         unless rule.match value
-          errors << "invalid value for tag #{format key}"
+          errors << 'invalid value for tag "%s"' % tag.name
         end
       when Proc
         if error = rule[value]
-          errors << "invalid value for tag #{format key}: #{error}"
+          errors << 'invalid value for tag "%s": %s' % [tag.name, error]
         end
       else
         raise ArgumentError
@@ -142,9 +148,5 @@ class MetaHeader
     }
 
     errors.empty? ? nil : errors
-  end
-
-  def format(key)
-    "@#{key}"
   end
 end
