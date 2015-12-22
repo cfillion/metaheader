@@ -15,18 +15,11 @@ class MetaHeader
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
-  def self.from_file(file)
-    input = String.new
-
-    File.foreach(file) {|line|
-      break if line.strip.empty?
-      input << line
-    }
-
-    self.new input
+  def self.from_file(file, transforms = [])
+    self.new File.read(file), transforms
   end
 
-  def initialize(input)
+  def initialize(input, transforms = [])
     @strict = false
     @data = {}
 
@@ -40,6 +33,8 @@ class MetaHeader
         self.<< line
       end
     }
+
+    Array(transforms).each {|tr| tr[self, input] }
   end
 
   def <<(line)
@@ -82,8 +77,17 @@ class MetaHeader
     tag = @data[key] and tag.value
   end
 
+  def []=(key, value)
+    @data[key] ||= Tag.new key
+    @data[key].value = value
+  end
+
   def size
     @data.size
+  end
+
+  def empty?
+    @data.empty?
   end
 
   def to_h

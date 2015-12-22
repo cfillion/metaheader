@@ -8,6 +8,19 @@ class TestParser < MiniTest::Test
     assert_equal 1, mh.size
   end
 
+  def test_set_value
+    mh = MetaHeader.new String.new
+
+    assert_empty mh
+    mh[:hello] = 'world'
+    assert_equal 'world', mh[:hello]
+    refute_empty mh
+
+    mh[:hello] = 'bacon'
+    assert_equal 'bacon', mh[:hello]
+    assert_equal 1, mh.size
+  end
+
   def test_unrequired_value
     mh = MetaHeader.new '@hello'
     assert_equal true, mh[:hello]
@@ -148,5 +161,30 @@ class TestParser < MiniTest::Test
     expected = {:hello => 'world'}
 
     assert_equal expected.inspect, mh.inspect
+  end
+
+  def test_transform_from_text
+    input = "Hello\n\nWorld".freeze
+    called = false
+
+    mh = MetaHeader.new input, proc {|mh, tr_input|
+      assert_same input, tr_input
+      assert_same MetaHeader, mh.class
+      called = true
+    }
+
+    assert called
+  end
+
+  def test_transform_from_file
+    path = File.expand_path '../../lib/metaheader.rb', __FILE__
+    called = false
+
+    mh = MetaHeader.from_file path, proc {|mh, input|
+      assert_equal File.read(path), input
+      called = true
+    }
+
+    assert called
   end
 end
