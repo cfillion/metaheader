@@ -1,6 +1,38 @@
 require File.expand_path '../helper', __FILE__
 
+class CustomParser < MetaHeader::Parser
+  def self.reset
+    @@called = false
+  end
+
+  def self.called?
+    @@called
+  end
+
+  def self.input
+    @@input
+  end
+
+  def self.instance
+    @@instance
+  end
+
+  def parse(input)
+    return unless header[:run_custom]
+
+    header[:hello] = header[:hello].to_s * 2
+
+    @@input = input
+    @@instance = header
+    @@called = true
+  end
+end
+
 class TestParser < MiniTest::Test
+  def setup
+    CustomParser.reset
+  end
+
   def test_basic_parser
     mh = MetaHeader.new '@hello world'
 
@@ -164,27 +196,24 @@ class TestParser < MiniTest::Test
   end
 
   def test_transform_from_text
-    input = "Hello\n\nWorld".freeze
-    called = false
+    input = "@run_custom\nHello\n\nWorld".freeze
 
-    mh = MetaHeader.new input, proc {|mh, tr_input|
-      assert_same input, tr_input
-      assert_same MetaHeader, mh.class
-      called = true
-    }
+    mh = MetaHeader.new input
 
-    assert called
+    assert CustomParser.called?
+    assert_same input, CustomParser.input
+    assert_same mh, CustomParser.instance
   end
 
   def test_transform_from_file
-    path = File.expand_path '../../lib/metaheader.rb', __FILE__
+    path = File.expand_path '../input/custom_parser', __FILE__
     called = false
 
-    mh = MetaHeader.from_file path, proc {|mh, input|
-      assert_equal File.read(path), input
-      called = true
-    }
+    mh = MetaHeader.from_file path
+    assert_equal 'worldworld', mh[:hello]
 
-    assert called
+    assert CustomParser.called?
+    assert_equal File.read(path), CustomParser.input
+    assert_same mh, CustomParser.instance
   end
 end

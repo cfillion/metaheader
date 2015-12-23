@@ -3,6 +3,20 @@
 require 'metaheader/version'
 
 class MetaHeader
+  class Parser
+    def self.each(&b)
+      ObjectSpace.each_object(Class).select { |klass| klass < self }.each &b
+    end
+
+    def initialize(mh)
+      @mh = mh
+    end
+
+    def header
+      @mh
+    end
+  end
+
   REQUIRED = Object.new.freeze
   OPTIONAL = Object.new.freeze
 
@@ -15,11 +29,11 @@ class MetaHeader
     (?:\s+(?<value>[^\n]+))?
     \Z/x.freeze
 
-  def self.from_file(file, transforms = [])
-    self.new File.read(file), transforms
+  def self.from_file(file)
+    self.new File.read(file)
   end
 
-  def initialize(input, transforms = [])
+  def initialize(input)
     @strict = false
     @data = {}
 
@@ -34,7 +48,10 @@ class MetaHeader
       end
     }
 
-    Array(transforms).each {|tr| tr[self, input] }
+    Parser.each {|klass|
+      parser = klass.new self
+      parser.parse input
+    }
   end
 
   def <<(line)
