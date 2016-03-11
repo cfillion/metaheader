@@ -63,7 +63,7 @@ class TestParser < MiniTest::Test
     assert_equal 'bacon', mh[:chunky]
   end
 
-  def test_multiline
+  def test_two_tags
     mh = MetaHeader.new <<-IN
     -- @chunky bacon
     -- @hello world
@@ -74,7 +74,7 @@ class TestParser < MiniTest::Test
     assert_equal 2, mh.size
   end
 
-  def test_break_empty_line
+  def test_break_at_empty_line
     mh = MetaHeader.new <<-IN
     -- @hello world
 
@@ -207,7 +207,6 @@ class TestParser < MiniTest::Test
 
   def test_transform_from_file
     path = File.expand_path '../input/custom_parser', __FILE__
-    called = false
 
     mh = MetaHeader.from_file path
     assert_equal 'worldworld', mh[:hello]

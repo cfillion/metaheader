@@ -5,7 +5,7 @@ require 'metaheader/version'
 class MetaHeader
   class Parser
     def self.each(&b)
-      ObjectSpace.each_object(Class).select { |klass| klass < self }.each &b
+      ObjectSpace.each_object(Class).select { |klass| klass < self }.each(&b)
     end
 
     def initialize(mh)
