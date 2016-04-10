@@ -130,7 +130,7 @@ class MetaHeader
       end
     }
 
-    errors.empty? ? nil : errors
+    errors unless errors.empty?
   end
 
   def validate_key(key, rules)
@@ -168,6 +168,6 @@ class MetaHeader
       end
     }
 
-    errors.empty? ? nil : errors
+    errors unless errors.empty?
   end
 end
