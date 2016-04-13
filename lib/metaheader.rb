@@ -5,7 +5,15 @@ require 'metaheader/version'
 class MetaHeader
   class Parser
     def self.each(&b)
-      ObjectSpace.each_object(Class).select { |klass| klass < self }.each(&b)
+      @parsers ||= begin
+        parsers = []
+        ObjectSpace.each_object(singleton_class).each {|klass|
+          parsers << klass unless klass == self
+        }
+        parsers
+      end
+
+      @parsers.each(&b)
     end
 
     def initialize(mh)
@@ -14,6 +22,10 @@ class MetaHeader
 
     def header
       @mh
+    end
+
+    def parse
+      raise NotImplementedError
     end
   end
 
