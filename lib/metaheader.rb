@@ -4,16 +4,13 @@ require 'metaheader/version'
 
 class MetaHeader
   class Parser
-    def self.each(&b)
-      @parsers ||= begin
-        parsers = []
-        ObjectSpace.each_object(singleton_class).each {|klass|
-          parsers << klass unless klass == self
-        }
-        parsers
-      end
+    def self.inherited(k)
+      @parsers ||= []
+      @parsers << k
+    end
 
-      @parsers.each(&b)
+    def self.each(&b)
+      @parsers&.each(&b)
     end
 
     def initialize(mh)
