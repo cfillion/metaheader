@@ -55,7 +55,7 @@ class TestValidator < MiniTest::Test
     mh = MetaHeader.new '@hello'
 
     actual = mh.validate :hello => [MetaHeader::VALUE]
-    assert_equal ["tag 'hello' must have a value"], actual
+    assert_equal ["missing value for tag 'hello'"], actual
   end
 
   def test_regex

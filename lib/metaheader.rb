@@ -172,7 +172,7 @@ class MetaHeader
         end
       when VALUE
         if str_value.empty?
-          errors << "tag '%s' must have a value" % tag.name
+          errors << "missing value for tag '%s'" % tag.name
         end
       when Regexp
         unless rule.match str_value
