@@ -136,8 +136,8 @@ class MetaHeader
     end
 
     rules.each_pair {|key, rule|
-      if key_errors = validate_key(key, rule)
-        errors.concat key_errors
+      if key_error = validate_key(key, rule)
+        errors << key_error
       end
     }
 
@@ -148,13 +148,11 @@ class MetaHeader
     rules = Array(rules)
     return if rules.empty?
 
-    errors = Array.new
-
     unless @data.has_key? key
       if rules.include? OPTIONAL
         return nil
       else
-        return ["missing tag '%s'" % key]
+        return "missing tag '%s'" % key
       end
     end
 
@@ -168,25 +166,25 @@ class MetaHeader
         # do nothing, required is taken care of above
       when SINGLELINE
         if str_value.include? "\n"
-          errors << "tag '%s' must be singleline" % tag.name
+          return "tag '%s' must be singleline" % tag.name
         end
       when VALUE
         if str_value.empty?
-          errors << "missing value for tag '%s'" % tag.name
+          return "missing value for tag '%s'" % tag.name
         end
       when Regexp
         unless rule.match str_value
-          errors << "invalid value for tag '%s'" % tag.name
+          return "invalid value for tag '%s'" % tag.name
         end
       when Proc
         if error = rule[tag.value]
-          errors << "invalid value for tag '%s': %s" % [tag.name, error]
+          return "invalid value for tag '%s': %s" % [tag.name, error]
         end
       else
         raise ArgumentError
       end
     }
 
-    errors unless errors.empty?
+    nil
   end
 end

@@ -94,11 +94,14 @@ class TestValidator < MiniTest::Test
   end
 
   def test_error_use_original_case
-    mh = MetaHeader.new 'HeLlO: world'
-    actual = mh.validate :hello => /\d+/
+    actual = validate 'HeLlO: world', hello: /\d+/
     assert_equal ["invalid value for tag 'HeLlO'"], actual
   end
 
+  def test_single_error_per_tag
+    actual = validate '@hello', hello: [/\d/, /\d/]
+    assert_equal ["invalid value for tag 'hello'"], actual
+  end
 
   def test_invalid_rule
     mh = MetaHeader.new '@hello world'
