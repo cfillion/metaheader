@@ -1,7 +1,5 @@
 require File.expand_path '../helper', __FILE__
 
-require 'tempfile'
-
 class CustomParser < MetaHeader::Parser
   def self.reset
     @@called = false
@@ -155,15 +153,11 @@ class TestParser < MiniTest::Test
   end
 
   def test_read_file
-    Tempfile.open 'metaheader-file-input' do |f|
-      f.write "# @test Hello World\n"
-      f.close
+    path = File.expand_path '../input/basic_tag', __FILE__
+    mh = MetaHeader.from_file path
 
-      mh = MetaHeader.from_file f.path
-
-      assert_equal 'Hello World', mh[:test]
-      assert_equal 1, mh.size
-    end
+    assert_equal 'Hello World', mh[:test]
+    assert_equal 1, mh.size
   end
 
   def test_to_hash
@@ -199,6 +193,12 @@ class TestParser < MiniTest::Test
     hash = {:hello => 'world'}
 
     assert_equal "#<MetaHeader #{hash.inspect}>", mh.inspect
+  end
+
+  def test_default_parser_implementation
+    assert_raises NotImplementedError do
+      MetaHeader::Parser.new.parse String.new
+    end
   end
 
   def test_transform_from_text

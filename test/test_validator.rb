@@ -21,7 +21,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_strict_optional
-    mh = MetaHeader.new "@hello\n@world"
+    mh = MetaHeader.new "@hello"
     mh.strict = true
 
     actual = mh.validate \
