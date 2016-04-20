@@ -1,115 +1,100 @@
 require File.expand_path '../helper', __FILE__
 
 class TestValidator < MiniTest::Test
-  def setup
-    @mh = MetaHeader.new <<-IN
-    @hello world
-    @chunky bacon
-    IN
+  def validate(input, rules)
+    MetaHeader.new(input).validate(rules)
   end
 
   def test_unknown_strict
-    @mh.strict = true
-    actual = @mh.validate Hash.new
+    mh = MetaHeader.new "@hello\n@world"
+    mh.strict = true
 
-    expected = [
-      'unknown tag "hello"',
-      'unknown tag "chunky"',
-    ]
-
-    assert_equal expected, actual
+    actual = mh.validate Hash.new
+    assert_equal ["unknown tag 'hello'", "unknown tag 'world'"], actual
   end
 
   def test_unknown_tolerant
-    refute @mh.strict
-    actual = @mh.validate Hash.new
+    mh = MetaHeader.new "@hello\n@world"
+    refute mh.strict
 
-    assert_nil actual
+    assert_nil mh.validate(Hash.new)
   end
 
-  def test_optional
-    actual = @mh.validate :hello => MetaHeader::OPTIONAL,
-      :chunky => MetaHeader::OPTIONAL
+  def test_strict_optional
+    mh = MetaHeader.new "@hello\n@world"
+    mh.strict = true
+
+    actual = mh.validate \
+      hello: MetaHeader::OPTIONAL,
+      world: MetaHeader::OPTIONAL
 
     assert_nil actual
   end
 
   def test_required
-    actual = @mh.validate :version => MetaHeader::REQUIRED,
-      :hello => MetaHeader::OPTIONAL, :chunky => MetaHeader::OPTIONAL
+    actual = validate '@foobar', version: MetaHeader::REQUIRED, foobar: []
+    assert_equal ["missing tag 'version'"], actual
+  end
 
-    expected = [
-      'missing tag "version"',
-    ]
+  def test_singleline
+    mh = MetaHeader.new <<-IN
+    @hello
+      chunky
+      bacon
+    @world
+      foo
+      bar
+    IN
 
-    assert_equal expected, actual
+    actual = mh.validate :hello => MetaHeader::SINGLELINE
+    assert_equal ["tag 'hello' must be singleline"], actual
+  end
+
+  def test_has_value
+    mh = MetaHeader.new '@hello'
+
+    actual = mh.validate :hello => [MetaHeader::VALUE]
+    assert_equal ["missing value for tag 'hello'"], actual
   end
 
   def test_regex
-    actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
-
-    expected = [
-      'invalid value for tag "hello"',
-    ]
-
-    assert_equal expected, actual
-  end
-
-  def test_use_original_format
-    @mh = MetaHeader.new 'HeLlO: world'
-    actual = @mh.validate :hello => /\d+/
-
-    expected = [
-      'invalid value for tag "HeLlO"',
-    ]
-
-    assert_equal expected, actual
-  end
-
-  def test_regex_missing
-    actual = @mh.validate :version => /\d+/,
-      :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
-
-    expected = [
-      'missing tag "version"',
-    ]
-
-    assert_equal expected, actual
-  end
-
-  def test_regex_optional
-    actual = @mh.validate :version => [MetaHeader::OPTIONAL, /\d+/],
-      :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
-
-    assert_nil actual
+    actual = validate '@hello world', :hello => /\d+/
+    assert_equal ["invalid value for tag 'hello'"], actual
   end
 
   def test_regex_no_value
-    @mh = MetaHeader.new '@hello'
-    actual = @mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
+    mh = MetaHeader.new '@hello'
 
-    expected = [
-      'invalid value for tag "hello"',
-    ]
-
-    assert_equal expected, actual
+    actual = mh.validate :hello => [/./]
+    assert_equal ["invalid value for tag 'hello'"], actual
   end
 
   def test_custom_validator
-    valid = @mh.validate :hello => Proc.new {|value| value == 'world' && nil }
-    assert_nil valid
+    actual = validate '@hello',
+      hello: Proc.new {|value| assert_equal true, value; nil }
+    assert_nil actual
 
-    expected = [
-      'invalid value for tag "hello": Hello World!',
-    ]
+    actual = validate '@hello world',
+      hello: Proc.new {|value| assert_equal 'world', value; nil }
+    assert_nil actual
 
-    invalid = @mh.validate :hello => Proc.new {|value| 'Hello World!' }
-    assert_equal expected, invalid
+    actual = validate '@hello', hello: Proc.new {|value| 'Hello World!' }
+    assert_equal ["invalid value for tag 'hello': Hello World!"], actual
+  end
+
+  def test_error_use_original_case
+    actual = validate 'HeLlO: world', hello: /\d+/
+    assert_equal ["invalid value for tag 'HeLlO'"], actual
+  end
+
+  def test_single_error_per_tag
+    actual = validate '@hello', hello: [/\d/, /\d/]
+    assert_equal ["invalid value for tag 'hello'"], actual
   end
 
   def test_invalid_rule
     assert_raises ArgumentError do
-      @mh.validate_key :hello, :hello => Object.new
+      validate '@hello world', hello: Object.new
     end
   end
 end

@@ -190,9 +190,9 @@ class TestParser < MiniTest::Test
 
   def test_inspect
     mh = MetaHeader.new '@hello world'
-    expected = {:hello => 'world'}
+    hash = {:hello => 'world'}
 
-    assert_equal expected.inspect, mh.inspect
+    assert_equal "#<MetaHeader #{hash.inspect}>", mh.inspect
   end
 
   def test_transform_from_text

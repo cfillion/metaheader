@@ -46,14 +46,15 @@ mh = MetaHeader.new input
 # mark unknown keys as invalid
 # mh.strict = true
 
-# set @key as optional
-errors = mh.validate :key => MetaHeader::OPTIONAL
+# set @key as mandatory
+errors = mh.validate key: MetaHeader::REQUIRED
 
-# or set @key as required:
-# mh.validate :key => MetaHeader::REQUIRED
-#
-# ensure @key contains a valid value with a regex
-# mh.validate :key => /^\w{2,}$/
+# other validators are available:
+# mh.validate key: MetaHeader::OPTIONAL
+# mh.validate key: MetaHeader::SINGLELINE
+# mh.validate key: MetaHeader::HAS_VALUE
+# mh.validate key: /^\w{2,}$/
+# mh.validate key: proc {|value| 'return nil or error' }
 
 value = mh[:key]
 ```
