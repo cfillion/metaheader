@@ -159,27 +159,27 @@ class MetaHeader
     end
 
     tag = @data[key]
-    value = tag.value
-    value = String.new if value == true
+    str_value = tag.value
+    str_value = String.new if str_value == true
 
     rules.each {|rule|
       case rule
       when REQUIRED, OPTIONAL
         # do nothing
       when SINGLELINE
-        if value.include? "\n"
+        if str_value.include? "\n"
           errors << "tag '%s' must be singleline" % tag.name
         end
       when HAS_VALUE
-        if value.empty?
+        if str_value.empty?
           errors << "tag '%s' must have a value" % tag.name
         end
       when Regexp
-        unless rule.match value
+        unless rule.match str_value
           errors << "invalid value for tag '%s'" % tag.name
         end
       when Proc
-        if error = rule[value]
+        if error = rule[tag.value]
           errors << "invalid value for tag '%s': %s" % [tag.name, error]
         end
       else

@@ -88,11 +88,17 @@ class TestValidator < MiniTest::Test
   end
 
   def test_custom_validator
-    valid = @mh.validate :hello => Proc.new {|value| value == 'world' && nil }
-    assert_nil valid
+    actual = MetaHeader.new('@hello').validate \
+      :hello => Proc.new {|value| assert_equal true, value; nil }
+    assert_nil actual
 
-    invalid = @mh.validate :hello => Proc.new {|value| 'Hello World!' }
-    assert_equal ["invalid value for tag 'hello': Hello World!"], invalid
+    actual = MetaHeader.new('@hello world').validate \
+      :hello => Proc.new {|value| assert_equal 'world', value; nil }
+    assert_nil actual
+
+    actual = MetaHeader.new('@hello').validate \
+      :hello => Proc.new {|value| 'Hello World!' }
+    assert_equal ["invalid value for tag 'hello': Hello World!"], actual
   end
 
   def test_invalid_rule
