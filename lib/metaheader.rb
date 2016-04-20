@@ -28,6 +28,7 @@ class MetaHeader
 
   REQUIRED = Object.new.freeze
   OPTIONAL = Object.new.freeze
+  SINGLELINE = Object.new.freeze
 
   Tag = Struct.new :name, :value
 
@@ -164,6 +165,10 @@ class MetaHeader
       case rule
       when REQUIRED, OPTIONAL
         # do nothing
+      when SINGLELINE
+        if value.include? "\n"
+          errors << 'tag "%s" must be singleline' % tag.name
+        end
       when Regexp
         unless rule.match value
           errors << 'invalid value for tag "%s"' % tag.name

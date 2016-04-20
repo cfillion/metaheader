@@ -45,6 +45,20 @@ class TestValidator < MiniTest::Test
     assert_equal expected, actual
   end
 
+  def test_singleline
+    mh = MetaHeader.new <<-IN
+    @hello
+      chunky
+      bacon
+    @world
+      foo
+      bar
+    IN
+
+    actual = mh.validate :hello => MetaHeader::SINGLELINE
+    assert_equal ['tag "hello" must be singleline'], actual
+  end
+
   def test_regex
     actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
 
