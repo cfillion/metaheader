@@ -28,7 +28,7 @@ class MetaHeader
 
   REQUIRED = Object.new.freeze
   OPTIONAL = Object.new.freeze
-  HAS_VALUE = Object.new.freeze
+  VALUE = Object.new.freeze
   SINGLELINE = Object.new.freeze
 
   Tag = Struct.new :name, :value
@@ -165,12 +165,12 @@ class MetaHeader
     rules.each {|rule|
       case rule
       when REQUIRED, OPTIONAL
-        # do nothing
+        # do nothing, required is taken care of above
       when SINGLELINE
         if str_value.include? "\n"
           errors << "tag '%s' must be singleline" % tag.name
         end
-      when HAS_VALUE
+      when VALUE
         if str_value.empty?
           errors << "tag '%s' must have a value" % tag.name
         end
