@@ -176,8 +176,8 @@ class MetaHeader
         unless rule.match str_value
           return "invalid value for tag '%s'" % tag.name
         end
-      when Proc
-        if error = rule[tag.value]
+      when Proc, Method
+        if error = rule.call(tag.value)
           return "invalid value for tag '%s': %s" % [tag.name, error]
         end
       else
