@@ -93,9 +93,8 @@ class TestValidator < MiniTest::Test
   end
 
   def test_invalid_rule
-    mh = MetaHeader.new '@hello world'
     assert_raises ArgumentError do
-      mh.validate_key :hello, hello: Object.new
+      validate '@hello world', hello: Object.new
     end
   end
 end

@@ -3,25 +3,29 @@
 require 'metaheader/version'
 
 class MetaHeader
+  # @abstract Subclass and override {#parse} to implement a custom parser.
   class Parser
-    def self.inherited(k)
-      @parsers ||= []
-      @parsers << k
+    class << self
+      # @!visibility private
+      def inherited(k)
+        @parsers ||= []
+        @parsers << k
+      end
+
+      # @!visibility private
+      def each(&b)
+        @parsers&.each(&b)
+      end
     end
 
-    def self.each(&b)
-      @parsers&.each(&b)
-    end
-
-    def initialize(mh)
-      @mh = mh
-    end
-
+    # @return [MetaHeader] the current instance
     def header
       @mh
     end
 
-    def parse
+    # @param raw_input [String]
+    # @return [void]
+    def parse(raw_input)
       raise NotImplementedError
     end
   end
@@ -31,19 +35,20 @@ class MetaHeader
   VALUE = Object.new.freeze
   SINGLELINE = Object.new.freeze
 
-  Tag = Struct.new :name, :value
-
+  # Whether to fail validation if unknown tags are encoutered.
+  # @see #validate
+  # @return [Boolean]
   attr_accessor :strict
 
-  REGEX = /\A(?<prefix>.*?)
-    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
-    (?:\s+(?<value>[^\n]+))?
-    \Z/x.freeze
-
-  def self.from_file(file)
-    self.new File.read(file)
+  # Create a new instance from the contents of a file.
+  # @param path [String] path to the file to be read
+  # @return [MetaHeader]
+  def self.from_file(path)
+    self.new File.read(path)
   end
 
+  # Parse every tags found in input up to the first newline.
+  # @param input [String]
   def initialize(input)
     @strict = false
     @data = {}
@@ -55,17 +60,95 @@ class MetaHeader
       if line.strip.empty?
         break
       else
-        self.<< line
+        parse line
       end
     }
 
     Parser.each {|klass|
-      parser = klass.new self
+      parser = klass.new
+      parser.instance_variable_set :@mh, self
       parser.parse input
     }
   end
 
-  def <<(line)
+  # Returns the value of a tag by its name, or nil if not found.
+  # @return [Object, nil]
+  def [](key)
+    tag = @data[key] and tag.value
+  end
+
+  # Replaces the value of a tag.
+  # @param value the new value
+  # @return value
+  def []=(key, value)
+    @data[key] ||= Tag.new key
+    @data[key].value = value
+  end
+
+  # Returns how many tags were found in the input.
+  # @return [Fixnum]
+  def size
+    @data.size
+  end
+
+  # Whether any tags were found in the input.
+  # @return [Boolean]
+  def empty?
+    @data.empty?
+  end
+
+  # Make a hash from the parsed data
+  # @return [Hash]
+  def to_h
+    Hash[@data.map {|v| [v.first, v.last.value] }]
+  end
+
+  # Makes a human-readable representation of the current instance.
+  # @return [String]
+  def inspect
+    "#<#{self.class} #{to_h}>"
+  end
+
+  # Validates parsed data according to a custom set of rules.
+  # @example
+  #   mh = MetaHeader.new "@hello world\n@chunky bacon"
+  #   mh.validate \
+  #     hello: [MetaHeader::REQUIRED, MetaHeader::SINGLELINE, /\d/],
+  #     chunky: proc {|value| 'not bacon' unless value == 'bacon' }
+  # @param rules [Hash] tag_name => rule or array_of_rules
+  # @return [Array, nil] error list or nil
+  # @see REQUIRED
+  # @see OPTIONAL
+  # @see VALUE
+  # @see SINGLELINE
+  def validate(rules)
+    errors = Array.new
+
+    if @strict
+      @data.each_key {|key|
+        errors << "unknown tag '%s'" % key unless rules.has_key? key
+      }
+    end
+
+    rules.each_pair {|key, rule|
+      if key_error = validate_key(key, rule)
+        errors << key_error
+      end
+    }
+
+    errors unless errors.empty?
+  end
+
+private
+  # @!visibility private
+  Tag = Struct.new :name, :value
+
+  REGEX = /\A(?<prefix>.*?)
+    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
+    (?:\s+(?<value>[^\n]+))?
+    \Z/x.freeze
+
+  def parse(line)
     # multiline value must have the same prefix
     if @last_key && line.index(@last_prefix) == 0
       # remove the line prefix
@@ -101,48 +184,6 @@ class MetaHeader
     @data[@last_key] = Tag.new match[:key].freeze, value
   end
 
-  def [](key)
-    tag = @data[key] and tag.value
-  end
-
-  def []=(key, value)
-    @data[key] ||= Tag.new key
-    @data[key].value = value
-  end
-
-  def size
-    @data.size
-  end
-
-  def empty?
-    @data.empty?
-  end
-
-  def to_h
-    Hash[@data.map {|v| [v.first, v.last.value] }]
-  end
-
-  def inspect
-    to_h.inspect
-  end
-
-  def validate(rules)
-    errors = Array.new
-
-    if @strict
-      @data.each_key {|key|
-        errors << "unknown tag '%s'" % key unless rules.has_key? key
-      }
-    end
-
-    rules.each_pair {|key, rule|
-      if key_error = validate_key(key, rule)
-        errors << key_error
-      end
-    }
-
-    errors unless errors.empty?
-  end
 
   def validate_key(key, rules)
     rules = Array(rules)
