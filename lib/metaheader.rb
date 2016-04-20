@@ -130,7 +130,7 @@ class MetaHeader
 
     if @strict
       @data.each_key {|key|
-        errors << 'unknown tag "%s"' % key unless rules.has_key? key
+        errors << "unknown tag '%s'" % key unless rules.has_key? key
       }
     end
 
@@ -153,7 +153,7 @@ class MetaHeader
       if rules.include? OPTIONAL
         return nil
       else
-        return ['missing tag "%s"' % key]
+        return ["missing tag '%s'" % key]
       end
     end
 
@@ -167,15 +167,15 @@ class MetaHeader
         # do nothing
       when SINGLELINE
         if value.include? "\n"
-          errors << 'tag "%s" must be singleline' % tag.name
+          errors << "tag '%s' must be singleline" % tag.name
         end
       when Regexp
         unless rule.match value
-          errors << 'invalid value for tag "%s"' % tag.name
+          errors << "invalid value for tag '%s'" % tag.name
         end
       when Proc
         if error = rule[value]
-          errors << 'invalid value for tag "%s": %s' % [tag.name, error]
+          errors << "invalid value for tag '%s': %s" % [tag.name, error]
         end
       else
         raise ArgumentError

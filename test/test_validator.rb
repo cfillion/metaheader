@@ -10,14 +10,9 @@ class TestValidator < MiniTest::Test
 
   def test_unknown_strict
     @mh.strict = true
+
     actual = @mh.validate Hash.new
-
-    expected = [
-      'unknown tag "hello"',
-      'unknown tag "chunky"',
-    ]
-
-    assert_equal expected, actual
+    assert_equal ["unknown tag 'hello'", "unknown tag 'chunky'"], actual
   end
 
   def test_unknown_tolerant
@@ -38,11 +33,7 @@ class TestValidator < MiniTest::Test
     actual = @mh.validate :version => MetaHeader::REQUIRED,
       :hello => MetaHeader::OPTIONAL, :chunky => MetaHeader::OPTIONAL
 
-    expected = [
-      'missing tag "version"',
-    ]
-
-    assert_equal expected, actual
+    assert_equal ["missing tag 'version'"], actual
   end
 
   def test_singleline
@@ -56,39 +47,23 @@ class TestValidator < MiniTest::Test
     IN
 
     actual = mh.validate :hello => MetaHeader::SINGLELINE
-    assert_equal ['tag "hello" must be singleline'], actual
+    assert_equal ["tag 'hello' must be singleline"], actual
   end
 
   def test_regex
     actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
-
-    expected = [
-      'invalid value for tag "hello"',
-    ]
-
-    assert_equal expected, actual
+    assert_equal ["invalid value for tag 'hello'"], actual
   end
 
   def test_use_original_format
-    @mh = MetaHeader.new 'HeLlO: world'
-    actual = @mh.validate :hello => /\d+/
-
-    expected = [
-      'invalid value for tag "HeLlO"',
-    ]
-
-    assert_equal expected, actual
+    mh = MetaHeader.new 'HeLlO: world'
+    actual = mh.validate :hello => /\d+/
+    assert_equal ["invalid value for tag 'HeLlO'"], actual
   end
 
   def test_regex_missing
-    actual = @mh.validate :version => /\d+/,
-      :hello => MetaHeader::REQUIRED, :chunky => MetaHeader::OPTIONAL
-
-    expected = [
-      'missing tag "version"',
-    ]
-
-    assert_equal expected, actual
+    actual = @mh.validate :version => /\d+/
+    assert_equal ["missing tag 'version'"], actual
   end
 
   def test_regex_optional
@@ -99,26 +74,18 @@ class TestValidator < MiniTest::Test
   end
 
   def test_regex_no_value
-    @mh = MetaHeader.new '@hello'
-    actual = @mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
+    mh = MetaHeader.new '@hello'
 
-    expected = [
-      'invalid value for tag "hello"',
-    ]
-
-    assert_equal expected, actual
+    actual = mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
+    assert_equal ["invalid value for tag 'hello'"], actual
   end
 
   def test_custom_validator
     valid = @mh.validate :hello => Proc.new {|value| value == 'world' && nil }
     assert_nil valid
 
-    expected = [
-      'invalid value for tag "hello": Hello World!',
-    ]
-
     invalid = @mh.validate :hello => Proc.new {|value| 'Hello World!' }
-    assert_equal expected, invalid
+    assert_equal ["invalid value for tag 'hello': Hello World!"], invalid
   end
 
   def test_invalid_rule
