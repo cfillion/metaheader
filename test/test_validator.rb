@@ -32,8 +32,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_required
-    actual = validate '@foobar', version: MetaHeader::REQUIRED
-
+    actual = validate '@foobar', version: MetaHeader::REQUIRED, foobar: []
     assert_equal ["missing tag 'version'"], actual
   end
 
@@ -63,20 +62,10 @@ class TestValidator < MiniTest::Test
     assert_equal ["invalid value for tag 'hello'"], actual
   end
 
-  def test_regex_missing
-    actual = validate '', version: /\d+/
-    assert_equal ["missing tag 'version'"], actual
-  end
-
-  def test_regex_optional
-    actual = validate '', version: [MetaHeader::OPTIONAL, /\d+/]
-    assert_nil actual
-  end
-
   def test_regex_no_value
     mh = MetaHeader.new '@hello'
 
-    actual = mh.validate :hello => [MetaHeader::OPTIONAL, /.+/]
+    actual = mh.validate :hello => [/./]
     assert_equal ["invalid value for tag 'hello'"], actual
   end
 

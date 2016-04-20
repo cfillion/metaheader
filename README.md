@@ -46,11 +46,11 @@ mh = MetaHeader.new input
 # mark unknown keys as invalid
 # mh.strict = true
 
-# set @key as optional
-errors = mh.validate key: MetaHeader::OPTIONAL
+# set @key as mandatory
+errors = mh.validate key: MetaHeader::REQUIRED
 
 # other validators are available:
-# mh.validate key: MetaHeader::REQUIRED
+# mh.validate key: MetaHeader::OPTIONAL
 # mh.validate key: MetaHeader::SINGLELINE
 # mh.validate key: MetaHeader::HAS_VALUE
 # mh.validate key: /^\w{2,}$/

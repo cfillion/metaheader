@@ -149,10 +149,10 @@ class MetaHeader
     return if rules.empty?
 
     unless @data.has_key? key
-      if rules.include? OPTIONAL
-        return nil
-      else
+      if rules.include? REQUIRED
         return "missing tag '%s'" % key
+      else
+        return nil
       end
     end
 
@@ -163,7 +163,7 @@ class MetaHeader
     rules.each {|rule|
       case rule
       when REQUIRED, OPTIONAL
-        # do nothing, required is taken care of above
+        # nothing to do here: REQUIRED is handled in the code above
       when SINGLELINE
         if str_value.include? "\n"
           return "tag '%s' must be singleline" % tag.name
