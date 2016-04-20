@@ -4,13 +4,13 @@ class MetaHeader
   # @abstract Subclass and override {#parse} to implement a custom parser.
   class Parser
     class << self
-      # @!visibility private
+      # @api private
       def inherited(k)
         @parsers ||= []
         @parsers << k
       end
 
-      # @!visibility private
+      # @api private
       def each(&b)
         @parsers&.each(&b)
       end
@@ -138,7 +138,7 @@ class MetaHeader
   end
 
 private
-  # @!visibility private
+  # @api private
   Tag = Struct.new :name, :value
 
   REGEX = /\A(?<prefix>.*?)
