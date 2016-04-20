@@ -50,6 +50,13 @@ class TestValidator < MiniTest::Test
     assert_equal ["tag 'hello' must be singleline"], actual
   end
 
+  def test_has_value
+    mh = MetaHeader.new '@hello'
+
+    actual = mh.validate :hello => [MetaHeader::HAS_VALUE]
+    assert_equal ["tag 'hello' must have a value"], actual
+  end
+
   def test_regex
     actual = @mh.validate :hello => /\d+/, :chunky => MetaHeader::OPTIONAL
     assert_equal ["invalid value for tag 'hello'"], actual

@@ -49,12 +49,12 @@ mh = MetaHeader.new input
 # set @key as optional
 errors = mh.validate :key => MetaHeader::OPTIONAL
 
-# other validators are supplied:
+# other validators are available:
 # mh.validate :key => MetaHeader::REQUIRED
 # mh.validate :key => MetaHeader::SINGLELINE
-#
-# ensure @key contains a valid value with a regex
+# mh.validate :key => MetaHeader::HAS_VALUE
 # mh.validate :key => /^\w{2,}$/
+# mh.validate :key => proc {|value| 'return nil or error' }
 
 value = mh[:key]
 ```
