@@ -1,5 +1,3 @@
-# @test Hello World
-
 require 'metaheader/version'
 
 class MetaHeader
