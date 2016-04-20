@@ -58,3 +58,16 @@ errors = mh.validate key: MetaHeader::REQUIRED
 
 value = mh[:key]
 ```
+
+## Documentation
+
+MetaHeader's documentation is hosted at
+[http://rubydoc.info/gems/metaheader/MetaHeader](http://rubydoc.info/gems/metaheader/MetaHeader).
+
+## Contributing
+
+1. [Fork this repository](https://github.com/cfillion/metaheader/fork)
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push -u origin my-new-feature`)
+5. Create a new Pull Request
