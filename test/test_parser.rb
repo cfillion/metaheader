@@ -162,23 +162,17 @@ class TestParser < MiniTest::Test
 
   def test_to_hash
     mh = MetaHeader.new '@key value'
-    expected = {:key => 'value'}
-
-    assert_equal expected, mh.to_h
+    assert_equal Hash[key: 'value'], mh.to_h
   end
 
   def test_alternate_syntax
     mh = MetaHeader.new 'Key Test: value'
-    expected = {:key_test => 'value'}
-
-    assert_equal expected, mh.to_h
+    assert_equal Hash[key_test: 'value'], mh.to_h
   end
 
   def test_alternate_syntax_prefix
     mh = MetaHeader.new '-- Key Test: Value'
-    expected = {key_test: 'Value'}
-
-    assert_equal expected, mh.to_h
+    assert_equal Hash[key_test: 'Value'], mh.to_h
   end
 
   def test_windows_newlines
@@ -189,15 +183,13 @@ class TestParser < MiniTest::Test
 
   def test_alternate_syntax_trailing_space
     mh = MetaHeader.new ' Key Test : Value'
-    expected = {:key_test => 'Value'}
-
-    assert_equal expected, mh.to_h
+    assert_equal Hash[key_test: 'value'], mh.to_h
   end
 
   def test_inspect
     mh = MetaHeader.new '@hello world'
-    hash = {:hello => 'world'}
 
+    hash = {hello: 'world'}
     assert_equal "#<MetaHeader #{hash.inspect}>", mh.inspect
   end
 
