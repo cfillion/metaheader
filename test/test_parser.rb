@@ -176,9 +176,15 @@ class TestParser < MiniTest::Test
 
   def test_alternate_syntax_prefix
     mh = MetaHeader.new '-- Key Test: Value'
-    expected = {:key_test => 'Value'}
+    expected = {key_test: 'Value'}
 
     assert_equal expected, mh.to_h
+  end
+
+  def test_windows_newlines
+    mh = MetaHeader.new "key: value\r\n@run_custom"
+    assert_equal 'value', mh[:key]
+    assert_equal "key: value\n@run_custom", CustomParser.input
   end
 
   def test_alternate_syntax_trailing_space
@@ -207,7 +213,7 @@ class TestParser < MiniTest::Test
     mh = MetaHeader.new input
 
     assert CustomParser.called?
-    assert_same input, CustomParser.input
+    assert_equal input, CustomParser.input
     assert_same mh, CustomParser.instance
   end
 

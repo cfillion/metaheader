@@ -54,6 +54,7 @@ class MetaHeader
     @last_key = nil
     @last_prefix = String.new
 
+    input = input.encode universal_newline: true
     input.each_line {|line|
       if line.strip.empty?
         break
