@@ -183,7 +183,7 @@ class TestParser < MiniTest::Test
 
   def test_alternate_syntax_trailing_space
     mh = MetaHeader.new ' Key Test : Value'
-    assert_equal Hash[key_test: 'value'], mh.to_h
+    assert_equal Hash[key_test: 'Value'], mh.to_h
   end
 
   def test_inspect
