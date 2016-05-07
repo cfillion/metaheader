@@ -50,9 +50,10 @@ mh = MetaHeader.new input
 errors = mh.validate key: MetaHeader::REQUIRED
 
 # other validators are available:
+# mh.validate key: MetaHeader::BOOLEAN
 # mh.validate key: MetaHeader::OPTIONAL
 # mh.validate key: MetaHeader::SINGLELINE
-# mh.validate key: MetaHeader::HAS_VALUE
+# mh.validate key: MetaHeader::VALUE
 # mh.validate key: /^\w{2,}$/
 # mh.validate key: proc {|value| 'return nil or error' }
 

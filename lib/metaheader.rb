@@ -28,10 +28,11 @@ class MetaHeader
     end
   end
 
-  REQUIRED = Object.new.freeze
+  BOOLEAN = Object.new.freeze
   OPTIONAL = Object.new.freeze
-  VALUE = Object.new.freeze
+  REQUIRED = Object.new.freeze
   SINGLELINE = Object.new.freeze
+  VALUE = Object.new.freeze
 
   # Whether to fail validation if unknown tags are encoutered.
   # @see #validate
@@ -123,10 +124,11 @@ class MetaHeader
   #     chunky: proc {|value| 'not bacon' unless value == 'bacon' }
   # @param rules [Hash] tag_name => rule or array_of_rules
   # @return [Array, nil] error list or nil
-  # @see REQUIRED
+  # @see BOOLEAN
   # @see OPTIONAL
-  # @see VALUE
+  # @see REQUIRED
   # @see SINGLELINE
+  # @see VALUE
   def validate(rules)
     errors = Array.new
 
@@ -217,6 +219,10 @@ private
       when VALUE
         if str_value.empty?
           return "missing value for tag '%s'" % tag.name
+        end
+      when BOOLEAN
+        unless [TrueClass, FalseClass].include? tag.value.class
+          return "tag '%s' cannot have a value" % tag.name
         end
       when Regexp
         unless rule.match str_value

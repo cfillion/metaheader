@@ -97,4 +97,10 @@ class TestValidator < MiniTest::Test
       validate '@hello world', hello: Object.new
     end
   end
+
+  def test_boolean
+    actual = validate "@hello\n@hello world",
+      hello: MetaHeader::BOOLEAN
+    assert_equal ["tag 'hello' cannot have a value"], actual
+  end
 end
