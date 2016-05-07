@@ -107,7 +107,7 @@ class MetaHeader
   # Make a hash from the parsed data
   # @return [Hash]
   def to_h
-    Hash[@data.map {|v| [v.first, v.last.value] }]
+    Hash[@data.map {|name, tag| [name, tag.value] }]
   end
 
   # Makes a human-readable representation of the current instance.
