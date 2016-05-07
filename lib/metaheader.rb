@@ -233,7 +233,7 @@ private
           return "invalid value for tag '%s': %s" % [tag.name, error]
         end
       else
-        raise ArgumentError
+        raise ArgumentError, "unsupported validator #{rule}"
       end
     }
 

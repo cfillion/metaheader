@@ -93,9 +93,13 @@ class TestValidator < MiniTest::Test
   end
 
   def test_invalid_rule
-    assert_raises ArgumentError do
-      validate '@hello world', hello: Object.new
+    obj = Object.new.freeze
+
+    error = assert_raises ArgumentError do
+      validate '@hello world', hello: obj
     end
+
+    assert_equal "unsupported validator #{obj.inspect}", error.message
   end
 
   def test_boolean
