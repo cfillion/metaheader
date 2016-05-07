@@ -96,6 +96,13 @@ class MetaHeader
     @data.empty?
   end
 
+  # Whether a tag was found in the input.
+  # @param tag [Symbol] the tag to lookup
+  # @return [Boolean]
+  def has?(tag)
+    @data.has_key? tag.to_sym
+  end
+
   # Make a hash from the parsed data
   # @return [Hash]
   def to_h
@@ -182,7 +189,6 @@ private
     value = match[:value] || true
     @data[@last_key] = Tag.new match[:key].freeze, value
   end
-
 
   def validate_key(key, rules)
     rules = Array(rules)

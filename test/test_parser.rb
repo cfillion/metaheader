@@ -219,4 +219,10 @@ class TestParser < MiniTest::Test
     assert_equal File.read(path), CustomParser.input
     assert_same mh, CustomParser.instance
   end
+
+  def test_has_tag
+    mh = MetaHeader.new '@hello'
+    assert_equal true, mh.has?(:hello)
+    assert_equal false, mh.has?(:world)
+  end
 end
