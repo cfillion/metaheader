@@ -186,10 +186,30 @@ private
 
     # single line
     @last_prefix = match[:prefix]
-    @last_key = match[:key].downcase.gsub(/[^\w]/, '_').to_sym
+    key = match[:key].downcase.gsub(/[^\w]/, '_')
 
-    value = match[:value] || true
+    key, value = parse_value key, match[:value]
+
+    @last_key = key.to_sym
     @data[@last_key] = Tag.new match[:key].freeze, value
+  end
+
+  def parse_value(key, value)
+    case value
+    when nil
+      if key =~ /\Ano./
+        key[0...2] = ''
+        value = false
+      else
+        value = true
+      end
+    when 'true'
+      value = true
+    when 'false'
+      value = false
+    end
+
+    [key, value]
   end
 
   def validate_key(key, rules)

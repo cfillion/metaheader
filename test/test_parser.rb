@@ -53,9 +53,18 @@ class TestParser < MiniTest::Test
     assert_equal 1, mh.size
   end
 
-  def test_unrequired_value
-    mh = MetaHeader.new '@hello'
+  def test_implicit_boolean
+    mh = MetaHeader.new "@hello\n@noworld"
     assert_equal true, mh[:hello]
+
+    refute mh.has?(:noworld), 'noworld tag exists'
+    assert_equal false, mh[:world]
+  end
+
+  def test_explicit_boolean
+    mh = MetaHeader.new "@hello true\n@world false"
+    assert_equal true, mh[:hello]
+    assert_equal false, mh[:world]
   end
 
   def test_ignore_prefix

@@ -14,6 +14,10 @@
   value line 2
 
 @key
+@key true
+
+@nokey
+@key false
 ```
 
 Any kind of comment syntax or prefix can be used:
