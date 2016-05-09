@@ -235,4 +235,9 @@ class TestParser < MiniTest::Test
     assert_equal true, mh.has?(:hello)
     assert_equal false, mh.has?(:world)
   end
+
+  def test_default_value
+    mh = MetaHeader.new String.new
+    assert_equal 'world', mh[:hello, 'world']
+  end
 end

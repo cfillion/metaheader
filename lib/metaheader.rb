@@ -72,9 +72,15 @@ class MetaHeader
   end
 
   # Returns the value of a tag by its name, or nil if not found.
+  # @param key [Symbol] tag name
+  # @param default [Object] value to return if key doesn't exist
   # @return [Object, nil]
-  def [](key)
-    tag = @data[key] and tag.value
+  def [](key, default = nil)
+    if tag = @data[key]
+      tag.value
+    else
+      default
+    end
   end
 
   # Replaces the value of a tag.
