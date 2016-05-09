@@ -162,6 +162,15 @@ class TestParser < MiniTest::Test
     assert_equal 1, mh.size
   end
 
+  def test_multiline_explicit_boolean
+    mh = MetaHeader.new <<-IN
+    @test true
+      test
+    IN
+
+    assert_equal "true\ntest", mh[:test]
+  end
+
   def test_read_file
     path = File.expand_path '../input/basic_tag', __FILE__
     mh = MetaHeader.from_file path

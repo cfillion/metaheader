@@ -174,12 +174,8 @@ private
       if indent_level > 0
         tag = @data[@last_key]
 
-        if tag.value.is_a? String
-          tag.value += "\n"
-        else
-          tag.value = String.new
-        end
-
+        tag.value = @raw_value.to_s unless tag.value.is_a? String
+        tag.value += "\n" unless tag.value.empty?
         tag.value += stripped
 
         return
@@ -194,6 +190,7 @@ private
     @last_prefix = match[:prefix]
     key = match[:key].downcase.gsub(/[^\w]/, '_')
 
+    @raw_value = match[:value]
     key, value = parse_value key, match[:value]
 
     @last_key = key.to_sym
