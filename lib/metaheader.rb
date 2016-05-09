@@ -212,7 +212,12 @@ private
 
     if key =~ /\Ano./
       key[0...2] = ''
-      value = !value
+      case value
+      when true
+        value = false
+      when false
+        value = true
+      end
     end
 
     [key, value]

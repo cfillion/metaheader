@@ -103,8 +103,14 @@ class TestValidator < MiniTest::Test
   end
 
   def test_boolean
-    actual = validate "@hello\n@hello world",
+    actual = validate "@hello true\n@hello world",
       hello: MetaHeader::BOOLEAN
     assert_equal ["tag 'hello' cannot have a value"], actual
+  end
+
+  def test_boolean_implicit_false
+    actual = validate "@nohello world",
+      hello: MetaHeader::BOOLEAN
+    assert_equal ["tag 'nohello' cannot have a value"], actual
   end
 end
