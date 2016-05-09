@@ -62,9 +62,10 @@ class TestParser < MiniTest::Test
   end
 
   def test_explicit_boolean
-    mh = MetaHeader.new "@hello true\n@world false"
-    assert_equal true, mh[:hello]
-    assert_equal false, mh[:world]
+    mh = MetaHeader.new "@foo true\n@bar false\n@nobaz false"
+    assert_equal true, mh[:foo]
+    assert_equal false, mh[:bar]
+    assert_equal true, mh[:baz]
   end
 
   def test_ignore_prefix

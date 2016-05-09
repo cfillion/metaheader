@@ -195,18 +195,18 @@ private
   end
 
   def parse_value(key, value)
+    value ||= true
+
     case value
-    when nil
-      if key =~ /\Ano./
-        key[0...2] = ''
-        value = false
-      else
-        value = true
-      end
     when 'true'
       value = true
     when 'false'
       value = false
+    end
+
+    if key =~ /\Ano./
+      key[0...2] = ''
+      value = !value
     end
 
     [key, value]
