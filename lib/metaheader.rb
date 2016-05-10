@@ -209,6 +209,7 @@ private
 
     if key =~ /\Ano./
       key[0...2] = ''
+
       case value
       when true
         value = false
