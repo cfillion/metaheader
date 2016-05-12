@@ -112,6 +112,12 @@ class MetaHeader
     @data.has_key? tag.to_sym
   end
 
+  # Removes a given tag from the list.
+  # @param tag [Symbol] the tag to remove
+  def delete(tag)
+    @data.delete tag
+  end
+
   # Make a hash from the parsed data
   # @return [Hash]
   def to_h

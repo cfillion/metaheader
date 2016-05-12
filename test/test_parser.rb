@@ -252,4 +252,11 @@ class TestParser < MiniTest::Test
     mh = MetaHeader.new String.new
     assert_equal 'world', mh[:hello, 'world']
   end
+
+  def test_delete
+    mh = MetaHeader.new '@hello world'
+    assert mh.has?(:hello)
+    mh.delete :hello
+    refute mh.has?(:hello)
+  end
 end
