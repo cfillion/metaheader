@@ -51,6 +51,9 @@ class TestParser < MiniTest::Test
     mh[:hello] = 'bacon'
     assert_equal 'bacon', mh[:hello]
     assert_equal 1, mh.size
+
+    error = assert_raises(ArgumentError) { mh[:hello] = nil }
+    assert_equal 'value cannot be nil', error.message
   end
 
   def test_implicit_boolean

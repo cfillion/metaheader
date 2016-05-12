@@ -87,6 +87,8 @@ class MetaHeader
   # @param value the new value
   # @return value
   def []=(key, value)
+    raise ArgumentError, 'value cannot be nil' if value.nil?
+
     @data[key] ||= Tag.new key
     @data[key].value = value
   end
