@@ -198,8 +198,8 @@ private
     @last_prefix = match[:prefix]
     key = match[:key].downcase.gsub(/[^\w]/, '_')
 
-    @raw_value = match[:value]
-    key, value = parse_value key, match[:value]
+    @raw_value = match[:value]&.strip
+    key, value = parse_value key, @raw_value
 
     @last_key = key.to_sym
     @data[@last_key] = Tag.new match[:key].freeze, value
@@ -213,6 +213,8 @@ private
       value = true
     when 'false'
       value = false
+    when String
+      value = nil if value.empty?
     end
 
     if key =~ /\Ano./

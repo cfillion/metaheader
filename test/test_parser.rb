@@ -133,6 +133,15 @@ class TestParser < MiniTest::Test
     assert_equal "Lorem\nIpsum", mh[:test]
   end
 
+  def test_multiline_leading_space
+    mh = MetaHeader.new <<-IN
+    @test \x20
+      test\x20
+    IN
+
+    assert_equal "test", mh[:test]
+  end
+
   def test_multiline_prefix
     mh = MetaHeader.new <<-IN
 --    @test Lorem
