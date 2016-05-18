@@ -171,6 +171,8 @@ private
     \Z/x.freeze
 
   def parse(line)
+    line.rstrip!
+
     # multiline value must have the same prefix
     if @last_key && line.index(@last_prefix) == 0
       # remove the line prefix
@@ -198,7 +200,7 @@ private
     @last_prefix = match[:prefix]
     key = match[:key].downcase.gsub(/[^\w]/, '_')
 
-    @raw_value = match[:value]&.strip
+    @raw_value = match[:value]
     key, value = parse_value key, @raw_value
 
     @last_key = key.to_sym
