@@ -57,18 +57,14 @@ class TestParser < MiniTest::Test
   end
 
   def test_implicit_boolean
-    mh = MetaHeader.new "@hello\n@noworld"
+    mh = MetaHeader.new "@hello"
     assert_equal true, mh[:hello]
-
-    refute mh.has?(:noworld), 'noworld tag exists'
-    assert_equal false, mh[:world]
   end
 
   def test_explicit_boolean
-    mh = MetaHeader.new "@foo true\n@bar false\n@nobaz false"
+    mh = MetaHeader.new "@foo true\n@bar false"
     assert_equal true, mh[:foo]
     assert_equal false, mh[:bar]
-    assert_equal true, mh[:baz]
   end
 
   def test_ignore_prefix

@@ -219,17 +219,6 @@ private
       value = nil if value.empty?
     end
 
-    if key =~ /\Ano./
-      key[0...2] = ''
-
-      case value
-      when true
-        value = false
-      when false
-        value = true
-      end
-    end
-
     [key, value]
   end
 
