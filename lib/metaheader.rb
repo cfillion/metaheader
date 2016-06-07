@@ -46,6 +46,17 @@ class MetaHeader
     self.new File.read(path)
   end
 
+  # Construct a new MetaHeader object or return the object untouched
+  # @param input [String, MetaHeader]
+  # @return [MetaHeader]
+  def self.parse(input)
+    if input.is_a? self
+      input
+    else
+      self.new input
+    end
+  end
+
   # Parse every tags found in input up to the first newline.
   # @param input [String]
   def initialize(input)

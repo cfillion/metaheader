@@ -267,4 +267,9 @@ class TestParser < MiniTest::Test
     mh.delete :hello
     refute mh.has?(:hello)
   end
+
+  def test_construct_from_instance
+    mh = MetaHeader.new '@hello world'
+    assert_same mh, MetaHeader.parse(mh)
+  end
 end
