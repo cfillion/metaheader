@@ -172,14 +172,25 @@ class MetaHeader
     errors unless errors.empty?
   end
 
-  def alias(new, old = nil)
-    case new
-    when Array
-      new.each {|k| self.alias k, old }
-    when Hash
-      new.each {|k, v| self.alias k, v }
+  # Rename one or more tags.
+  # @param old [Symbol, Hash]
+  # @param new [Symbol]
+  # @example
+  #   mh.alias :old, :new
+  #   mh.alias :old1, :old2, :new
+  #   mh.alias [:old1, :old2], :new
+  #   mh.alias old1: :new1, old2: :new2
+  def alias(*args)
+    raise ArgumentError, 'wrong number of arguments' unless args.size.between? 1, 2
+
+    tags, new = args
+
+    if args.size == 1
+      tags.each {|k, v| self.alias k, v }
     else
-      @data[old] = delete new if has? new
+      Array(tags).each {|old|
+        @data[new] = delete old if has? old
+      }
     end
   end
 

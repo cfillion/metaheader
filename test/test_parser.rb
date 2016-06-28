@@ -294,8 +294,14 @@ class TestParser < MiniTest::Test
 
   def test_alias_array
     mh = MetaHeader.new "@a 1\n@b 2"
-    mh.alias [:a, :b, :c] => :d
+    mh.alias [:a, :b, :c], :d
     assert [:a, :b, :c].none? {|t| mh.has? t }
     assert_equal '2', mh[:d]
+  end
+
+  def test_alias_invalid_args
+    mh = MetaHeader.new "@a 1\n@b 2"
+    assert_raises(ArgumentError) { mh.alias }
+    assert_raises(ArgumentError) { mh.alias 1, 2, 3 }
   end
 end
