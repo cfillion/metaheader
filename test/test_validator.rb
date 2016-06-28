@@ -107,4 +107,11 @@ class TestValidator < MiniTest::Test
       hello: MetaHeader::BOOLEAN
     assert_equal ["tag 'hello' cannot have a value"], actual
   end
+
+  def test_alias
+    mh = MetaHeader.new "@a"
+    mh.alias :a, :b
+    assert_equal ["missing value for tag 'a'"],
+      mh.validate(b: [MetaHeader::REQUIRED, MetaHeader::VALUE])
+  end
 end

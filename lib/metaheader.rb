@@ -120,7 +120,7 @@ class MetaHeader
   # @param tag [Symbol] the tag to lookup
   # @return [Boolean]
   def has?(tag)
-    @data.has_key? tag.to_sym
+    @data.has_key? tag
   end
 
   # Removes a given tag from the list.
@@ -170,6 +170,17 @@ class MetaHeader
     }
 
     errors unless errors.empty?
+  end
+
+  def alias(new, old = nil)
+    case new
+    when Array
+      new.each {|k| self.alias k, old }
+    when Hash
+      new.each {|k, v| self.alias k, v }
+    else
+      @data[old] = delete new if has? new
+    end
   end
 
 private

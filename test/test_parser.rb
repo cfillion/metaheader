@@ -272,4 +272,30 @@ class TestParser < MiniTest::Test
     mh = MetaHeader.new '@hello world'
     assert_same mh, MetaHeader.parse(mh)
   end
+
+  def test_alias
+    mh = MetaHeader.new '@a 1'
+    mh.alias :a, :b
+    refute mh.has?(:a)
+    assert_equal '1', mh[:b]
+
+    mh[:d] = '2'
+    mh.alias :c, :d
+    refute mh.has?(:c)
+    assert_equal '2', mh[:d]
+  end
+
+  def test_alias_hash
+    mh = MetaHeader.new "@a 1\n@b 2"
+    mh.alias a: :c, b: :d
+    assert_equal '1', mh[:c]
+    assert_equal '2', mh[:d]
+  end
+
+  def test_alias_array
+    mh = MetaHeader.new "@a 1\n@b 2"
+    mh.alias [:a, :b, :c] => :d
+    assert [:a, :b, :c].none? {|t| mh.has? t }
+    assert_equal '2', mh[:d]
+  end
 end
