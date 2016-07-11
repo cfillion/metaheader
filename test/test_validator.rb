@@ -6,11 +6,11 @@ class TestValidator < MiniTest::Test
   end
 
   def test_unknown_strict
-    mh = MetaHeader.new "@hello\n@world"
+    mh = MetaHeader.new "@hello\n@WORLD"
     mh.strict = true
 
     actual = mh.validate Hash.new
-    assert_equal ["unknown tag 'hello'", "unknown tag 'world'"], actual
+    assert_equal ["unknown tag 'hello'", "unknown tag 'WORLD'"], actual
   end
 
   def test_unknown_tolerant

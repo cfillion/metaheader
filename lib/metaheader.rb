@@ -157,8 +157,8 @@ class MetaHeader
     errors = Array.new
 
     if @strict
-      @data.each_key {|key|
-        errors << "unknown tag '%s'" % key unless rules.has_key? key
+      @data.each {|key, tag|
+        errors << "unknown tag '%s'" % tag.name unless rules.has_key? key
       }
     end
 
