@@ -65,6 +65,7 @@ class MetaHeader
 
     @last_key = nil
     @last_prefix = String.new
+    @line_breaks = 0
 
     input = input.encode universal_newline: true
     input.each_line {|line|
@@ -204,28 +205,16 @@ private
     \Z/x.freeze
 
   def parse(line)
-    line.rstrip!
-
-    # multiline value must have the same prefix
-    if @last_key && line.index(@last_prefix) == 0
-      # remove the line prefix
-      mline = line[@last_prefix.size..-1]
-      stripped = mline.strip
-
-      indent_level = mline.index stripped
-
-      if indent_level > 0
-        tag = @data[@last_key]
-
-        tag.value = @raw_value.to_s unless tag.value.is_a? String
-        tag.value += "\n" unless tag.value.empty?
-        tag.value += stripped
-
+    # multiline value must have the same line prefix as the key
+    if @last_key && line.start_with?(@last_prefix.rstrip)
+      if append line
         return
       else
         @last_key = nil
       end
     end
+
+    line.rstrip!
 
     return unless match = REGEX.match(line)
 
@@ -238,6 +227,31 @@ private
 
     @last_key = key.to_sym
     @data[@last_key] = Tag.new match[:key].freeze, value
+  end
+
+  def append(line)
+    # remove the line prefix
+    mline = line[@last_prefix.size..-1]
+
+    if mline&.empty?
+      @line_breaks += 1
+      return true # add the line break later
+    elsif !line.start_with? @last_prefix
+      return
+    else
+      stripped = mline.strip
+      indent_level = mline.index stripped
+      return if indent_level < 1
+    end
+
+    tag = @data[@last_key]
+
+    tag.value = @raw_value.to_s unless tag.value.is_a? String
+    @line_breaks += 1 unless tag.value.empty?
+    tag.value += "\n" * @line_breaks
+    @line_breaks = 0
+    tag.value += stripped
+    stripped
   end
 
   def parse_value(key, value)

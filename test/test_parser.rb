@@ -182,6 +182,18 @@ class TestParser < MiniTest::Test
     assert_equal "true\ntest", mh[:test]
   end
 
+  def test_multiline_empty_line
+    mh = MetaHeader.new <<-IN
+    -- @test
+    --   Hello
+    --
+    --   World
+    --
+    IN
+
+    assert_equal "Hello\n\nWorld", mh[:test]
+  end
+
   def test_read_file
     path = File.expand_path '../input/basic_tag', __FILE__
     mh = MetaHeader.from_file path
@@ -271,6 +283,7 @@ class TestParser < MiniTest::Test
   def test_construct_from_instance
     mh = MetaHeader.new '@hello world'
     assert_same mh, MetaHeader.parse(mh)
+    assert_equal mh.to_h, MetaHeader.parse('@hello world').to_h
   end
 
   def test_alias
