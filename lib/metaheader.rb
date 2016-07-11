@@ -64,8 +64,6 @@ class MetaHeader
     @data = {}
 
     @last_key = nil
-    @last_prefix = String.new
-    @line_breaks = 0
 
     input = input.encode universal_newline: true
     input.each_line {|line|
@@ -227,29 +225,29 @@ private
 
     @last_key = key.to_sym
     @data[@last_key] = Tag.new match[:key].freeze, value
+    @line_breaks = 0
   end
 
   def append(line)
-    # remove the line prefix
-    mline = line[@last_prefix.size..-1]
-
-    if mline&.empty?
+    if line.rstrip == @last_prefix.rstrip
       @line_breaks += 1
       return true # add the line break later
-    elsif !line.start_with? @last_prefix
-      return
-    else
+    elsif line.start_with? @last_prefix
+      mline = line[@last_prefix.size..-1]
       stripped = mline.strip
       indent_level = mline.index stripped
       return if indent_level < 1
+    else
+      return
     end
 
     tag = @data[@last_key]
-
     tag.value = @raw_value.to_s unless tag.value.is_a? String
+
     @line_breaks += 1 unless tag.value.empty?
     tag.value += "\n" * @line_breaks
     @line_breaks = 0
+
     tag.value += stripped
     stripped
   end

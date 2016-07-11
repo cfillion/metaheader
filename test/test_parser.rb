@@ -184,14 +184,17 @@ class TestParser < MiniTest::Test
 
   def test_multiline_empty_line
     mh = MetaHeader.new <<-IN
-    -- @test
-    --   Hello
+    --@test
+    --  Hello
     --
-    --   World
+    --  World
     --
+    --@chunky
+    --  bacon
     IN
 
     assert_equal "Hello\n\nWorld", mh[:test]
+    assert_equal 'bacon', mh[:chunky] # no leading newline
   end
 
   def test_read_file
