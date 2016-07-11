@@ -203,6 +203,8 @@ private
     \Z/x.freeze
 
   def parse(line)
+    line.chomp!
+
     # multiline value must have the same line prefix as the key
     if @last_key && line.start_with?(@last_prefix.rstrip)
       if append line
@@ -234,7 +236,7 @@ private
       return true # add the line break later
     elsif line.start_with? @last_prefix
       mline = line[@last_prefix.size..-1]
-      stripped = mline.strip
+      stripped = mline.lstrip
       indent_level = mline.index stripped
       return if indent_level < 1
     else
@@ -253,13 +255,13 @@ private
   end
 
   def parse_value(key, value)
-    value ||= true
-
     case value
     when 'true'
       value = true
     when 'false'
       value = false
+    when nil
+      value = true
     when String
       value = nil if value.empty?
     end

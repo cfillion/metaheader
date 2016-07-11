@@ -109,6 +109,11 @@ class TestParser < MiniTest::Test
     assert_equal 2, mh.size
   end
 
+  def test_trailing_whitespace
+    mh = MetaHeader.new '@hello world   '
+    assert_equal 'world', mh[:hello]
+  end
+
   def test_multiline
     mh = MetaHeader.new <<-IN
     @test Lorem
@@ -137,8 +142,8 @@ class TestParser < MiniTest::Test
       test\x20
     IN
 
-    assert_equal 'test', mh[:hello]
-    assert_equal 'test', mh[:world]
+    assert_equal 'test ', mh[:hello]
+    assert_equal 'test ', mh[:world]
   end
 
   def test_multiline_prefix
