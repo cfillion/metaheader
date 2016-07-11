@@ -197,6 +197,17 @@ class TestParser < MiniTest::Test
     assert_equal 'bacon', mh[:chunky] # no leading newline
   end
 
+  def test_multiline_empty_line_space_prefix
+    mh = MetaHeader.new <<-IN
+    -- @test
+    --   Hello
+    --
+    --   World
+    IN
+
+    assert_equal "Hello\n\nWorld", mh[:test]
+  end
+
   def test_read_file
     path = File.expand_path '../input/basic_tag', __FILE__
     mh = MetaHeader.from_file path
