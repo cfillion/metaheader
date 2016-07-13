@@ -43,7 +43,7 @@ class MetaHeader
   # @param path [String] path to the file to be read
   # @return [MetaHeader]
   def self.from_file(path)
-    self.new File.read(path)
+    File.open(path) {|file| self.new file }
   end
 
   # Construct a new MetaHeader object or return the object untouched
@@ -58,23 +58,22 @@ class MetaHeader
   end
 
   # Parse every tags found in input up to the first newline.
-  # @param input [String]
+  # @param input [String, IO]
   def initialize(input)
     @strict = false
     @data = {}
 
     @last_key = nil
 
-    input = input.encode universal_newline: true
-    input.each_line {|line|
-      if line.strip.empty?
-        break
-      else
-        parse line
-      end
-    }
+    unless input.is_a? IO
+      input = StringIO.new input.encode universal_newline: true
+    end
+
+    input.each_line {|line| break unless parse line }
 
     Parser.each {|klass|
+      input.rewind
+
       parser = klass.new
       parser.instance_variable_set :@mh, self
       parser.parse input
@@ -208,7 +207,7 @@ private
     # multiline value must have the same line prefix as the key
     if @last_key && line.start_with?(@last_prefix.rstrip)
       if append line
-        return
+        return true
       else
         @last_key = nil
       end
@@ -216,7 +215,7 @@ private
 
     line.rstrip!
 
-    return unless match = REGEX.match(line)
+    return !line.empty? unless match = REGEX.match(line)
 
     # single line
     @last_prefix = match[:prefix]

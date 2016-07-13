@@ -22,7 +22,7 @@ class CustomParser < MetaHeader::Parser
 
     header[:hello] = header[:hello].to_s * 2
 
-    @@input = input
+    @@input = input.read
     @@instance = header
     @@called = true
   end
@@ -187,7 +187,7 @@ class TestParser < MiniTest::Test
     assert_equal "true\ntest", mh[:test]
   end
 
-  def test_multiline_empty_line
+  def test_multiline_empty_line_prefix
     mh = MetaHeader.new <<-IN
     --@test
     --  Hello
@@ -202,6 +202,20 @@ class TestParser < MiniTest::Test
     assert_equal 'bacon', mh[:chunky] # no leading newline
   end
 
+  def test_multiline_empty_line
+    mh = MetaHeader.new <<-IN
+    @test
+      Hello
+
+      World
+
+    @chunky
+      bacon
+    IN
+
+    assert_equal "Hello\n\nWorld", mh[:test]
+    assert_equal 'bacon', mh[:chunky] # no leading newline
+  end
   def test_multiline_empty_line_space_prefix
     mh = MetaHeader.new <<-IN
     -- @test
