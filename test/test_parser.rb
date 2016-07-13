@@ -85,8 +85,8 @@ class TestParser < MiniTest::Test
 
   def test_break_at_empty_line
     mh = MetaHeader.new <<-IN
-    -- @hello world
-
+    @hello world
+\x20
     @chunky bacon
     IN
 
@@ -112,6 +112,16 @@ class TestParser < MiniTest::Test
   def test_trailing_whitespace
     mh = MetaHeader.new '@hello world   '
     assert_equal 'world', mh[:hello]
+  end
+
+  def test_empty_prefixed_line
+    mh = MetaHeader.new <<-IN
+    -- @first
+    --
+    -- @second
+    IN
+
+    refute_nil mh[:second]
   end
 
   def test_multiline
@@ -199,23 +209,9 @@ class TestParser < MiniTest::Test
     IN
 
     assert_equal "Hello\n\nWorld", mh[:test]
-    assert_equal 'bacon', mh[:chunky] # no leading newline
+    assert_equal 'bacon', mh[:chunky]
   end
 
-  def test_multiline_empty_line
-    mh = MetaHeader.new <<-IN
-    @test
-      Hello
-
-      World
-
-    @chunky
-      bacon
-    IN
-
-    assert_equal "Hello\n\nWorld", mh[:test]
-    assert_equal 'bacon', mh[:chunky] # no leading newline
-  end
   def test_multiline_empty_line_space_prefix
     mh = MetaHeader.new <<-IN
     -- @test
@@ -225,6 +221,33 @@ class TestParser < MiniTest::Test
     IN
 
     assert_equal "Hello\n\nWorld", mh[:test]
+  end
+
+  def test_multiline_empty_line
+    mh = MetaHeader.new <<-IN
+    @test
+      Hello
+
+      World
+    @chunky bacon
+
+    @foo
+    IN
+
+    assert_equal "Hello\n\nWorld", mh[:test]
+    assert_equal 'bacon', mh[:chunky]
+    assert_nil mh[:foo]
+  end
+
+  def test_multiline_break_at_empty_line
+    mh = MetaHeader.new <<-IN
+    -- @hello world
+
+    @chunky bacon
+    IN
+
+    assert_equal 'world', mh[:hello]
+    assert_nil mh[:chunky]
   end
 
   def test_read_file

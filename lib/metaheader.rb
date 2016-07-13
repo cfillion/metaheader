@@ -64,6 +64,7 @@ class MetaHeader
     @data = {}
 
     @last_key = nil
+    @empty_lines = 0
 
     unless input.is_a? IO
       input = StringIO.new input.encode universal_newline: true
@@ -215,6 +216,7 @@ private
 
     line.rstrip!
 
+    return false if @empty_lines > 0
     return !line.empty? unless match = REGEX.match(line)
 
     # single line
@@ -230,8 +232,10 @@ private
   end
 
   def append(line)
-    if line.rstrip == @last_prefix.rstrip
+    prefix = line.rstrip
+    if prefix == @last_prefix.rstrip
       @line_breaks += 1
+      @empty_lines += 1 if prefix.empty?
       return true # add the line break later
     elsif line.start_with? @last_prefix
       mline = line[@last_prefix.size..-1]
@@ -247,7 +251,7 @@ private
 
     @line_breaks += 1 unless tag.value.empty?
     tag.value += "\n" * @line_breaks
-    @line_breaks = 0
+    @line_breaks = @empty_lines = 0
 
     tag.value += stripped
     stripped
