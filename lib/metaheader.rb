@@ -199,7 +199,7 @@ private
 
   REGEX = /\A(?<prefix>.*?)
     (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
-    (?:\s+(?<value>[^\n]+))?
+    (?:\s*(?<value>[^\n]+))?
     \Z/x.freeze
 
   def parse(line)

@@ -284,6 +284,11 @@ class TestParser < MiniTest::Test
     assert_equal Hash[key_test: 'Value'], mh.to_h
   end
 
+  def test_alternate_syntax_compact
+    mh = MetaHeader.new 'Key Test:Value'
+    assert_equal Hash[key_test: 'Value'], mh.to_h
+  end
+
   def test_inspect
     mh = MetaHeader.new '@hello world'
 
