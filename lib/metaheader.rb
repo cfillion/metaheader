@@ -198,7 +198,7 @@ private
   Tag = Struct.new :name, :value
 
   REGEX = /\A(?<prefix>.*?)
-    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*:)
+    (?:@(?<key>\w+)|(?<key>[\w][\w\s]*?)\s*(?<alt>:))
     (?:\s*(?<value>[^\n]+))?
     \Z/x.freeze
 
@@ -218,6 +218,7 @@ private
 
     return false if @empty_lines > 0
     return !line.empty? unless match = REGEX.match(line)
+    return true if match[:alt] && match[:value].nil?
 
     # single line
     @last_prefix = match[:prefix]
