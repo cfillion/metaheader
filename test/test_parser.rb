@@ -250,6 +250,15 @@ class TestParser < MiniTest::Test
     assert_nil mh[:chunky]
   end
 
+  def test_multiline_alternate_syntax
+    mh = MetaHeader.new <<-IN
+    -- Hello:
+    --   World
+    IN
+
+    assert_equal 'World', mh[:hello]
+  end
+
   def test_read_file
     path = File.expand_path '../input/basic_tag', __FILE__
     mh = MetaHeader.from_file path

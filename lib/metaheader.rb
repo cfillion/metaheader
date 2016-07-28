@@ -63,7 +63,7 @@ class MetaHeader
     @strict = false
     @data = {}
 
-    @last_key = nil
+    @last_tag = nil
     @empty_lines = 0
 
     unless input.is_a? IO
@@ -206,11 +206,11 @@ private
     line.chomp!
 
     # multiline value must have the same line prefix as the key
-    if @last_key && line.start_with?(@last_prefix.rstrip)
+    if @last_tag && line.start_with?(@last_prefix.rstrip)
       if append line
         return true
       else
-        @last_key = nil
+        @last_tag = nil
       end
     end
 
@@ -218,18 +218,26 @@ private
 
     return false if @empty_lines > 0
     return !line.empty? unless match = REGEX.match(line)
-    return true if match[:alt] && match[:value].nil?
 
     # single line
     @last_prefix = match[:prefix]
-    key = match[:key].downcase.gsub(/[^\w]/, '_')
 
     @raw_value = match[:value]
-    key, value = parse_value key, @raw_value
+    value = parse_value @raw_value
 
-    @last_key = key.to_sym
-    @data[@last_key] = Tag.new match[:key].freeze, value
+    @last_tag = Tag.new match[:key].freeze, value
     @line_breaks = 0
+
+    # disable implicit values with the alternate syntax
+    register @last_tag unless match[:alt] && match[:value].nil?
+
+    # ok, give me another line!
+    true
+  end
+
+  def register(tag)
+    key = tag.name.downcase.gsub(/[^\w]/, '_').to_sym
+    @data[key] = tag
   end
 
   def append(line)
@@ -247,18 +255,19 @@ private
       return
     end
 
-    tag = @data[@last_key]
-    tag.value = @raw_value.to_s unless tag.value.is_a? String
+    # add the tag if it uses the alternate syntax and has no value
+    register @last_tag
 
-    @line_breaks += 1 unless tag.value.empty?
-    tag.value += "\n" * @line_breaks
+    @last_tag.value = @raw_value.to_s unless @last_tag.value.is_a? String
+
+    @line_breaks += 1 unless @last_tag.value.empty?
+    @last_tag.value += "\n" * @line_breaks
     @line_breaks = @empty_lines = 0
 
-    tag.value += stripped
-    stripped
+    @last_tag.value += stripped
   end
 
-  def parse_value(key, value)
+  def parse_value(value)
     case value
     when 'true'
       value = true
@@ -270,7 +279,7 @@ private
       value = nil if value.empty?
     end
 
-    [key, value]
+    value
   end
 
   def validate_key(key, rules)
