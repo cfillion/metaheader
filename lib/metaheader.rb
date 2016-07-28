@@ -21,7 +21,7 @@ class MetaHeader
       @mh
     end
 
-    # @param raw_input [String]
+    # @param raw_input [IO]
     # @return [void]
     def parse(raw_input)
       raise NotImplementedError
