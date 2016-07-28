@@ -236,6 +236,7 @@ private
   end
 
   def register(tag)
+    return if has? tag
     key = tag.name.downcase.gsub(/[^\w]/, '_').to_sym
     @data[key] = tag
   end
