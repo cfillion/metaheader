@@ -227,6 +227,7 @@ private
 
     @last_tag = Tag.new match[:key].freeze, value
     @line_breaks = 0
+    @block_indent = nil
 
     # disable implicit values with the alternate syntax
     register @last_tag unless match[:alt] && match[:value].nil?
@@ -241,6 +242,7 @@ private
     @data[key] = tag
   end
 
+  # handle multiline tags
   def append(line)
     prefix = line.rstrip
     if prefix == @last_prefix.rstrip
@@ -249,9 +251,19 @@ private
       return true # add the line break later
     elsif line.start_with? @last_prefix
       mline = line[@last_prefix.size..-1]
-      stripped = mline.lstrip
-      indent_level = mline.index stripped
-      return if indent_level < 1
+
+      if @block_indent
+        if mline.start_with? @block_indent
+          stripped = mline[@block_indent.size..-1]
+        else
+          return
+        end
+      else
+        stripped = mline.lstrip
+        indent_level = mline.index stripped
+        return if indent_level < 1
+        @block_indent = mline[0, indent_level]
+      end
     else
       return
     end

@@ -43,7 +43,7 @@ class TestMultiline < MiniTest::Test
     assert_equal 1, mh.size
   end
 
-  def test_wrong_indent
+  def test_no_indent
     mh = MetaHeader.new <<-IN
     @test Lorem
     Ipsum
@@ -52,6 +52,61 @@ class TestMultiline < MiniTest::Test
 
     assert_equal 1, mh.size
     assert_equal "Lorem", mh[:test]
+  end
+
+  def test_lose_indent
+    mh = MetaHeader.new <<-IN
+    @test
+      Hello
+
+      World
+    @chunky bacon
+
+    @foo
+    IN
+
+    assert_equal "Hello\n\nWorld", mh[:test]
+    assert_equal 'bacon', mh[:chunky]
+    assert_nil mh[:foo]
+  end
+
+  def test_fewer_indent
+    mh = MetaHeader.new <<-IN
+    @test Lorem
+      Ipsum
+     Hello
+      World
+    IN
+
+    assert_equal 1, mh.size
+    assert_equal "Lorem\nIpsum", mh[:test]
+  end
+
+  def test_extra_indent
+    mh = MetaHeader.new <<-IN
+    @test Lorem
+      Ipsum
+        Hello
+      World
+    IN
+
+    assert_equal 1, mh.size
+    assert_equal "Lorem\nIpsum\n  Hello\nWorld", mh[:test]
+  end
+
+  def test_do_not_reuse_indent
+    mh = MetaHeader.new <<-IN
+    @a
+      Lorem
+      Ipsum
+    @b
+    \tHello
+    \tWorld
+    IN
+
+    assert_equal 2, mh.size
+    assert_equal "Lorem\nIpsum", mh[:a]
+    assert_equal "Hello\nWorld", mh[:b]
   end
 
   def test_sub_alternate_syntax
