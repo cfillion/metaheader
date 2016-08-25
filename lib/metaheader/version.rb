@@ -1,4 +1,4 @@
 class MetaHeader
   # MetaHeader's version
-  VERSION = '1.3beta3'.freeze
+  VERSION = '1.3beta4'.freeze
 end
