@@ -104,7 +104,7 @@ class MetaHeader
   end
 
   # Returns how many tags were found in the input.
-  # @return [Fixnum]
+  # @return [Integer]
   def size
     @data.size
   end
