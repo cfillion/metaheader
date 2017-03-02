@@ -229,8 +229,7 @@ private
     @line_breaks = 0
     @block_indent = nil
 
-    # disable implicit values with the alternate syntax
-    register @last_tag unless match[:alt] && match[:value].nil?
+    register @last_tag
 
     # ok, give me another line!
     true

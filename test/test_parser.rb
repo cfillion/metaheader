@@ -165,7 +165,7 @@ class TestParser < MiniTest::Test
 
   def test_alternate_syntax_no_value
     mh = MetaHeader.new 'Key Test:'
-    assert_equal Hash.new, mh.to_h
+    assert_equal Hash[key_test: true], mh.to_h
   end
 
   def test_inspect
