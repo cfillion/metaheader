@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/metaheader.svg)](http://badge.fury.io/rb/metaheader)
 [![Build Status](https://travis-ci.org/cfillion/metaheader.svg?branch=master)](https://travis-ci.org/cfillion/metaheader)
-[![Coverage Status](https://coveralls.io/repos/cfillion/metaheader/badge.svg?branch=master&service=github)](https://coveralls.io/github/cfillion/metaheader?branch=master)
 
 ## Syntax
 
