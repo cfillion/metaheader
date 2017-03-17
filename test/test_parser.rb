@@ -257,4 +257,9 @@ class TestParser < MiniTest::Test
     assert_raises(ArgumentError) { mh.alias }
     assert_raises(ArgumentError) { mh.alias 1, 2, 3 }
   end
+
+  def test_utf16_bom
+    mh = MetaHeader.new "\xff\xfe@a b\n"
+    assert_equal 'b', mh[:a]
+  end
 end

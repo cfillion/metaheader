@@ -204,6 +204,7 @@ private
 
   def parse(line)
     line.chomp!
+    line.encode! Encoding::UTF_8, invalid: :replace
 
     # multiline value must have the same line prefix as the key
     if @last_tag && line.start_with?(@last_prefix.rstrip)
