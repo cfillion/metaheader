@@ -141,23 +141,18 @@ class MetaHeader
   end
 
   # Rename one or more tags.
-  # @param old [Symbol, Hash]
-  # @param new [Symbol]
+  # @param old [Symbol, Array<Symbol>, Hash<Symbol, Symbol>]
+  # @param new [Symbol] Ignored if old is a Hash
   # @example
   #   mh.alias :old, :new
-  #   mh.alias :old1, :old2, :new
   #   mh.alias [:old1, :old2], :new
   #   mh.alias old1: :new1, old2: :new2
-  def alias(*args)
-    raise ArgumentError, 'wrong number of arguments' unless args.size.between? 1, 2
-
-    tags, new = args
-
-    if args.size == 1
-      tags.each {|k, v| self.alias k, v }
+  def alias(old, new = nil)
+    if old.is_a? Hash
+      old.each {|k, v| self.alias k, v }
     else
-      Array(tags).each {|old|
-        @data[new] = delete old if has? old
+      Array(old).each {|tag|
+        @data[new] = delete tag if has? tag
       }
     end
   end

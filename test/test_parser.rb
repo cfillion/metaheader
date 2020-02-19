@@ -201,12 +201,6 @@ class TestParser < MiniTest::Test
     assert_equal '2', mh[:d]
   end
 
-  def test_alias_invalid_args
-    mh = MetaHeader.new
-    assert_raises(ArgumentError) { mh.alias }
-    assert_raises(ArgumentError) { mh.alias 1, 2, 3 }
-  end
-
   def test_utf16_bom
     mh = MetaHeader.parse "\xff\xfe@a b\n"
     assert_equal 'b', mh[:a]
