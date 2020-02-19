@@ -19,7 +19,8 @@
 @key false
 ```
 
-Any kind of comment syntax or prefix can be used:
+Any kind of comment syntax or prefix can be used (every line of a multiline
+value must begin with the same decoration characters):
 
 ```cpp
 /*
@@ -27,13 +28,14 @@ Any kind of comment syntax or prefix can be used:
  */
 ```
 
-An alternative syntax is also supported:
+An alternative syntax that allows spaces in the key name is also supported:
 
 ```
-Key Name: Value
+Key: Value
 ```
 
-Parsing stops at the first empty line (ignoring white space).
+Parsing stops at the first empty line outside of a multiline value
+(ignoring white space).
 
 ## Usage
 
@@ -41,13 +43,10 @@ Parsing stops at the first empty line (ignoring white space).
 require 'metaheader'
 
 input = '@key value'
-mh = MetaHeader.new input
+mh = MetaHeader.parse input
 
 # alternatively:
 # mh = MetaHeader.from_file path
-
-# mark unknown keys as invalid
-# mh.strict = true
 
 # set @key as mandatory
 errors = mh.validate key: MetaHeader::REQUIRED
@@ -65,13 +64,12 @@ value = mh[:key]
 
 ## Documentation
 
-MetaHeader's documentation is hosted at
-[http://rubydoc.info/gems/metaheader/MetaHeader](http://rubydoc.info/gems/metaheader/MetaHeader).
+MetaHeader's documentation is hosted at <https://rubydoc.info/gems/metaheader/MetaHeader>.
 
 ## Contributing
 
 1. [Fork this repository](https://github.com/cfillion/metaheader/fork)
-2. Create your feature branch (`git checkout -b my-new-feature`)
+2. Create your feature branch (`git switch -c my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push -u origin my-new-feature`)
 5. Create a new Pull Request
