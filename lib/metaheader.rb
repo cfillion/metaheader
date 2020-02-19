@@ -1,11 +1,24 @@
 require 'metaheader/version'
 
+# Parser for metadata header in plain-text files
+# @example
+#   mh = MetaHeader.parse '@hello world'
+#   puts mh[:hello]
 class MetaHeader
-  BOOLEAN = Object.new.freeze
+  # Allow a tag to be omitted when validating in strict mode.
   OPTIONAL = Object.new.freeze
+
+  # Ensure a tag exists during validation.
   REQUIRED = Object.new.freeze
-  SINGLELINE = Object.new.freeze
+
+  # The tag cannot hold a value beside true or false during validation.
+  BOOLEAN = Object.new.freeze
+
+  # The tag must have a string value (non-boolean tag) during validation.
   VALUE = Object.new.freeze
+
+  # Don't allow multiline values during validation.
+  SINGLELINE = Object.new.freeze
 
   # Create a new instance from the contents of a file.
   # @param path [String] path to the file to be read
@@ -63,7 +76,7 @@ class MetaHeader
 
   # Replaces the value of a tag.
   # @param value the new value
-  # @return value
+  # @return [Object] value
   def []=(key, value)
     raise ArgumentError, 'value cannot be nil' if value.nil?
 
@@ -97,7 +110,7 @@ class MetaHeader
   end
 
   # Make a hash from the parsed data
-  # @return [Hash]
+  # @return [Hash<Symbol, Object>]
   def to_h
     Hash[@data.map {|name, tag| [name, tag.value] }]
   end
@@ -109,19 +122,21 @@ class MetaHeader
   end
 
   # Validates parsed data according to a custom set of rules.
+  # A rule can be one of the predefined constants, a regex, a proc or a
+  # method (returing nil if the tag is valid or an error string otherwise).
   # @example
   #   mh = MetaHeader.new "@hello world\n@chunky bacon"
   #   mh.validate \
   #     hello: [MetaHeader::REQUIRED, MetaHeader::SINGLELINE, /\d/],
   #     chunky: proc {|value| 'not bacon' unless value == 'bacon' }
-  # @param rules [Hash] tag_name => rule or array_of_rules
-  # @param strict [Boolean] Whether to fail validation if unknown tags are encoutered.
+  # @param rules [Hash] :tag_name => rule or [rule1, rule2, ...]
+  # @param strict [Boolean] Whether to report unknown tags as errors
   # @return [Array<String>] List of error messasges
-  # @see BOOLEAN
   # @see OPTIONAL
   # @see REQUIRED
-  # @see SINGLELINE
+  # @see BOOLEAN
   # @see VALUE
+  # @see SINGLELINE
   def validate(rules, strict = false)
     errors = []
 
