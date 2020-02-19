@@ -12,7 +12,8 @@ class MetaHeader
 
       # @api private
       def each(&b)
-        @parsers&.each(&b)
+        @parser ||= []
+        @parsers.each &b
       end
     end
 
