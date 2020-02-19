@@ -92,12 +92,25 @@ class TestParser < MiniTest::Test
     refute_nil mh[:second]
   end
 
-  def test_read_file
+  def test_from_file
     path = File.expand_path '../input/basic_tag', __FILE__
     mh = MetaHeader.from_file path
 
     assert_equal 'Hello World', mh[:test]
     assert_equal 1, mh.size
+  end
+
+  def test_read_file_stream
+    path = File.expand_path '../input/basic_tag', __FILE__
+    mh = MetaHeader.new File.open(path)
+
+    assert_equal 'Hello World', mh[:test]
+    assert_equal 1, mh.size
+  end
+
+  def test_read_string_stream
+    stream = StringIO.new '@hello world'
+    MetaHeader.new stream
   end
 
   def test_to_hash

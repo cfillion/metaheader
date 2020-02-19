@@ -31,7 +31,7 @@ class MetaHeader
   end
 
   # Parse every tags found in input up to the first newline.
-  # @param input [String, IO]
+  # @param input [String, IO, StringIO]
   def initialize(input)
     @strict = false
     @data = {}
@@ -39,7 +39,7 @@ class MetaHeader
     @last_tag = nil
     @empty_lines = 0
 
-    unless input.is_a? IO
+    unless input.is_a?(IO) || input.is_a?(StringIO)
       input = StringIO.new input.encode universal_newline: true
     end
 
