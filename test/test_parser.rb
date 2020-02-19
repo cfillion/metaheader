@@ -1,38 +1,6 @@
 require File.expand_path '../helper', __FILE__
 
-class CustomParser < MetaHeader::Parser
-  def self.reset
-    @@called = false
-  end
-
-  def self.called?
-    @@called
-  end
-
-  def self.input
-    @@input
-  end
-
-  def self.instance
-    @@instance
-  end
-
-  def parse(input)
-    return unless header[:run_custom]
-
-    header[:hello] = header[:hello].to_s * 2
-
-    @@input = input.read
-    @@instance = header
-    @@called = true
-  end
-end
-
 class TestParser < MiniTest::Test
-  def setup
-    CustomParser.reset
-  end
-
   def test_basic_parser
     mh = MetaHeader.new '@hello world'
 
@@ -147,10 +115,10 @@ class TestParser < MiniTest::Test
     assert_equal Hash[key_test: 'Value'], mh.to_h
   end
 
-  def test_windows_newlines
+  def test_crlf_newlines
     mh = MetaHeader.new "key: value\r\n@run_custom"
     assert_equal 'value', mh[:key]
-    assert_equal "key: value\n@run_custom", CustomParser.input
+    assert_equal true, mh[:run_custom]
   end
 
   def test_alternate_syntax_trailing_space
@@ -173,33 +141,6 @@ class TestParser < MiniTest::Test
 
     hash = {hello: 'world'}
     assert_equal "#<MetaHeader #{hash.inspect}>", mh.inspect
-  end
-
-  def test_default_parser_implementation
-    assert_raises NotImplementedError do
-      MetaHeader::Parser.new.parse String.new
-    end
-  end
-
-  def test_transform_from_text
-    input = "@run_custom\nHello\n\nWorld".freeze
-
-    mh = MetaHeader.new input
-
-    assert CustomParser.called?
-    assert_equal input, CustomParser.input
-    assert_same mh, CustomParser.instance
-  end
-
-  def test_transform_from_file
-    path = File.expand_path '../input/custom_parser', __FILE__
-
-    mh = MetaHeader.from_file path
-    assert_equal 'worldworld', mh[:hello]
-
-    assert CustomParser.called?
-    assert_equal File.read(path), CustomParser.input
-    assert_same mh, CustomParser.instance
   end
 
   def test_has_tag

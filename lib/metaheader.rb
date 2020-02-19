@@ -1,34 +1,6 @@
 require 'metaheader/version'
 
 class MetaHeader
-  # @abstract Subclass and override {#parse} to implement a custom parser.
-  class Parser
-    class << self
-      # @api private
-      def inherited(k)
-        @parsers ||= []
-        @parsers << k
-      end
-
-      # @api private
-      def each(&b)
-        @parser ||= []
-        @parsers.each &b
-      end
-    end
-
-    # @return [MetaHeader] the current instance
-    def header
-      @mh
-    end
-
-    # @param raw_input [IO]
-    # @return [void]
-    def parse(raw_input)
-      raise NotImplementedError
-    end
-  end
-
   BOOLEAN = Object.new.freeze
   OPTIONAL = Object.new.freeze
   REQUIRED = Object.new.freeze
@@ -72,14 +44,6 @@ class MetaHeader
     end
 
     input.each_line {|line| break unless parse line }
-
-    Parser.each {|klass|
-      input.rewind
-
-      parser = klass.new
-      parser.instance_variable_set :@mh, self
-      parser.parse input
-    }
   end
 
   # Returns the value of a tag by its name, or nil if not found.
