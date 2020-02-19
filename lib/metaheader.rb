@@ -14,7 +14,7 @@ class MetaHeader
     File.open(path) {|file| self.parse file }
   end
 
-  # Construct a MetaHeader object and parse every tags found in input up to
+  # Construct a MetaHeader object and parse every tags found in the input up to
   # the first newline.
   # @param input [String, IO, StringIO]
   # @return [MetaHeader]
@@ -29,17 +29,17 @@ class MetaHeader
     @data = {}
   end
 
-  # Parse every tags found in input up to the first newline.
+  # Parse every tags found in the input up to the first newline.
   # @param input [String, IO, StringIO]
   # @return [Integer] Position of the first content line in the input data
   # following the header.
   def parse(input)
-    @last_tag = nil
-    @empty_lines = 0
-
-    unless input.is_a?(IO) || input.is_a?(StringIO)
+    if input.is_a? String
       input = StringIO.new input.encode universal_newline: true
     end
+
+    @last_tag = nil
+    @empty_lines = 0
 
     content_offset = 0
     input.each_line {|line|
