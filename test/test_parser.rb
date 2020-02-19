@@ -168,40 +168,41 @@ class TestParser < MiniTest::Test
   end
 
   def test_delete
-    mh = MetaHeader.parse '@hello world'
+    mh = MetaHeader.new
+    mh[:hello] = 'world'
     assert mh.has?(:hello)
     mh.delete :hello
     refute mh.has?(:hello)
   end
 
   def test_alias
-    mh = MetaHeader.parse '@a 1'
+    mh = MetaHeader.new
+    mh[:a] = '1'
     mh.alias :a, :b
     refute mh.has?(:a)
     assert_equal '1', mh[:b]
-
-    mh[:d] = '2'
-    mh.alias :c, :d
-    refute mh.has?(:c)
-    assert_equal '2', mh[:d]
   end
 
   def test_alias_hash
-    mh = MetaHeader.parse "@a 1\n@b 2"
+    mh = MetaHeader.new
+    mh[:a] = '1'
+    mh[:b] = '2'
     mh.alias a: :c, b: :d
     assert_equal '1', mh[:c]
     assert_equal '2', mh[:d]
   end
 
   def test_alias_array
-    mh = MetaHeader.parse "@a 1\n@b 2"
+    mh = MetaHeader.new
+    mh[:a] = '1'
+    mh[:b] = '2'
     mh.alias [:a, :b, :c], :d
     assert [:a, :b, :c].none? {|t| mh.has? t }
     assert_equal '2', mh[:d]
   end
 
   def test_alias_invalid_args
-    mh = MetaHeader.parse "@a 1\n@b 2"
+    mh = MetaHeader.new
     assert_raises(ArgumentError) { mh.alias }
     assert_raises(ArgumentError) { mh.alias 1, 2, 3 }
   end
