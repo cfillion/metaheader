@@ -13,7 +13,7 @@ class TestValidator < MiniTest::Test
 
   def test_unknown_tolerant
     mh = MetaHeader.parse "@hello\n@world"
-    assert_nil mh.validate(Hash.new, false)
+    assert_empty mh.validate(Hash.new, false)
   end
 
   def test_strict_optional
@@ -24,12 +24,12 @@ class TestValidator < MiniTest::Test
 
     mh = MetaHeader.parse "@hello"
     errors = mh.validate rules, true
-    assert_nil errors
+    assert_empty errors
   end
 
   def test_required
-    actual = validate '@foobar', version: MetaHeader::REQUIRED, foobar: []
-    assert_equal ["missing tag 'version'"], actual
+    errors = validate '@foobar', version: MetaHeader::REQUIRED, foobar: []
+    assert_equal ["missing tag 'version'"], errors
   end
 
   def test_singleline
@@ -42,50 +42,50 @@ class TestValidator < MiniTest::Test
       bar
     IN
 
-    actual = mh.validate :hello => MetaHeader::SINGLELINE
-    assert_equal ["tag 'hello' must be singleline"], actual
+    errors = mh.validate :hello => MetaHeader::SINGLELINE
+    assert_equal ["tag 'hello' must be singleline"], errors
   end
 
   def test_has_value
     mh = MetaHeader.parse '@hello'
 
-    actual = mh.validate :hello => [MetaHeader::VALUE]
-    assert_equal ["missing value for tag 'hello'"], actual
+    errors = mh.validate :hello => [MetaHeader::VALUE]
+    assert_equal ["missing value for tag 'hello'"], errors
   end
 
   def test_regex
-    actual = validate '@hello world', :hello => /\d+/
-    assert_equal ["invalid value for tag 'hello'"], actual
+    errors = validate '@hello world', :hello => /\d+/
+    assert_equal ["invalid value for tag 'hello'"], errors
   end
 
   def test_regex_no_value
     mh = MetaHeader.parse '@hello'
 
-    actual = mh.validate :hello => [/./]
-    assert_equal ["invalid value for tag 'hello'"], actual
+    errors = mh.validate :hello => [/./]
+    assert_equal ["invalid value for tag 'hello'"], errors
   end
 
   def test_custom_validator
-    actual = validate '@hello',
+    errors = validate '@hello',
       hello: Proc.new {|value| assert_equal true, value; nil }
-    assert_nil actual
+    assert_empty errors
 
-    actual = validate '@hello world',
+    errors = validate '@hello world',
       hello: Proc.new {|value| assert_equal 'world', value; nil }
-    assert_nil actual
+    assert_empty errors
 
-    actual = validate '@hello', hello: Proc.new {|value| 'Hello World!' }
-    assert_equal ["invalid value for tag 'hello': Hello World!"], actual
+    errors = validate '@hello', hello: Proc.new {|value| 'Hello World!' }
+    assert_equal ["invalid value for tag 'hello': Hello World!"], errors
   end
 
   def test_error_use_original_case
-    actual = validate 'HeLlO: world', hello: /\d+/
-    assert_equal ["invalid value for tag 'HeLlO'"], actual
+    errors = validate 'HeLlO: world', hello: /\d+/
+    assert_equal ["invalid value for tag 'HeLlO'"], errors
   end
 
   def test_single_error_per_tag
-    actual = validate '@hello', hello: [/\d/, /\d/]
-    assert_equal ["invalid value for tag 'hello'"], actual
+    errors = validate '@hello', hello: [/\d/, /\d/]
+    assert_equal ["invalid value for tag 'hello'"], errors
   end
 
   def test_invalid_rule
@@ -99,9 +99,9 @@ class TestValidator < MiniTest::Test
   end
 
   def test_boolean
-    actual = validate "@hello true\n@hello world",
+    errors = validate "@hello true\n@hello world",
       hello: MetaHeader::BOOLEAN
-    assert_equal ["tag 'hello' cannot have a value"], actual
+    assert_equal ["tag 'hello' cannot have a value"], errors
   end
 
   def test_alias

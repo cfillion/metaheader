@@ -116,14 +116,14 @@ class MetaHeader
   #     chunky: proc {|value| 'not bacon' unless value == 'bacon' }
   # @param rules [Hash] tag_name => rule or array_of_rules
   # @param strict [Boolean] Whether to fail validation if unknown tags are encoutered.
-  # @return [Array, nil] error list or nil
+  # @return [Array<String>] List of error messasges
   # @see BOOLEAN
   # @see OPTIONAL
   # @see REQUIRED
   # @see SINGLELINE
   # @see VALUE
   def validate(rules, strict = false)
-    errors = Array.new
+    errors = []
 
     if strict
       @data.each {|key, tag|
@@ -137,7 +137,7 @@ class MetaHeader
       end
     }
 
-    errors unless errors.empty?
+    errors
   end
 
   # Rename one or more tags.
