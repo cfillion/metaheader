@@ -2,7 +2,7 @@ require File.expand_path '../helper', __FILE__
 
 class TestMultiline < MiniTest::Test
   def test_multiline
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test Lorem
       Ipsum
     IN
@@ -12,7 +12,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_variant
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test
       Lorem
       Ipsum
@@ -22,7 +22,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_trailing_space
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @hello\x20
       test\x20
     @world\x20\x20
@@ -34,7 +34,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_prefix
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
 --    @test Lorem
 --      Ipsum
     IN
@@ -44,7 +44,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_no_indent
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test Lorem
     Ipsum
       Test
@@ -55,7 +55,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_lose_indent
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test
       Hello
 
@@ -71,7 +71,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_fewer_indent
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test Lorem
       Ipsum
      Hello
@@ -83,7 +83,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_extra_indent
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test Lorem
       Ipsum
         Hello
@@ -95,7 +95,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_do_not_reuse_indent
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @a
       Lorem
       Ipsum
@@ -110,7 +110,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_sub_alternate_syntax
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test Lorem
       Ipsum:
       Dolor: sit amet
@@ -121,7 +121,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_explicit_boolean
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test true
       test
     IN
@@ -130,7 +130,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_empty_line_prefix
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     --@test
     --  Hello
     --
@@ -145,7 +145,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_empty_line_prefix_with_space
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     -- @test
     --   Hello
     --
@@ -156,7 +156,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_empty_line
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @test
       Hello
 
@@ -172,7 +172,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_break_at_empty_line
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     -- @hello world
 
     @chunky bacon
@@ -183,7 +183,7 @@ class TestMultiline < MiniTest::Test
   end
 
   def test_alternate_syntax
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     -- Hello:
     --   World
     IN

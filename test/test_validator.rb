@@ -2,17 +2,17 @@ require File.expand_path '../helper', __FILE__
 
 class TestValidator < MiniTest::Test
   def validate(input, rules)
-    MetaHeader.new(input).validate(rules)
+    MetaHeader.parse(input).validate(rules)
   end
 
   def test_unknown_strict
-    mh = MetaHeader.new "@hello\n@WORLD"
+    mh = MetaHeader.parse "@hello\n@WORLD"
     errors = mh.validate Hash.new, true
     assert_equal ["unknown tag 'hello'", "unknown tag 'WORLD'"], errors
   end
 
   def test_unknown_tolerant
-    mh = MetaHeader.new "@hello\n@world"
+    mh = MetaHeader.parse "@hello\n@world"
     assert_nil mh.validate(Hash.new, false)
   end
 
@@ -22,7 +22,7 @@ class TestValidator < MiniTest::Test
       world: MetaHeader::OPTIONAL,
     }
 
-    mh = MetaHeader.new "@hello"
+    mh = MetaHeader.parse "@hello"
     errors = mh.validate rules, true
     assert_nil errors
   end
@@ -33,7 +33,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_singleline
-    mh = MetaHeader.new <<-IN
+    mh = MetaHeader.parse <<-IN
     @hello
       chunky
       bacon
@@ -47,7 +47,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_has_value
-    mh = MetaHeader.new '@hello'
+    mh = MetaHeader.parse '@hello'
 
     actual = mh.validate :hello => [MetaHeader::VALUE]
     assert_equal ["missing value for tag 'hello'"], actual
@@ -59,7 +59,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_regex_no_value
-    mh = MetaHeader.new '@hello'
+    mh = MetaHeader.parse '@hello'
 
     actual = mh.validate :hello => [/./]
     assert_equal ["invalid value for tag 'hello'"], actual
@@ -105,7 +105,7 @@ class TestValidator < MiniTest::Test
   end
 
   def test_alias
-    mh = MetaHeader.new "@a"
+    mh = MetaHeader.parse "@a"
     mh.alias :a, :b
     assert_equal ["missing value for tag 'a'"],
       mh.validate(b: [MetaHeader::REQUIRED, MetaHeader::VALUE])

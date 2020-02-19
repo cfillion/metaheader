@@ -7,33 +7,33 @@ class MetaHeader
   SINGLELINE = Object.new.freeze
   VALUE = Object.new.freeze
 
-  # Position of the first content line in the input data after the header.
-  # @return [Integer]
-  attr_reader :content_offset
-
   # Create a new instance from the contents of a file.
   # @param path [String] path to the file to be read
   # @return [MetaHeader]
   def self.from_file(path)
-    File.open(path) {|file| self.new file }
+    File.open(path) {|file| self.parse file }
   end
 
-  # Construct a new MetaHeader object or return the object untouched
-  # @param input [String, MetaHeader]
+  # Construct a MetaHeader object and parse every tags found in input up to
+  # the first newline.
+  # @param input [String, IO, StringIO]
   # @return [MetaHeader]
   def self.parse(input)
-    if input.is_a? self
-      input
-    else
-      self.new input
-    end
+    mh = MetaHeader.new
+    mh.parse input
+    mh
+  end
+
+  # Construct a blank MetaHeader object
+  def initialize
+    @data = {}
   end
 
   # Parse every tags found in input up to the first newline.
   # @param input [String, IO, StringIO]
-  def initialize(input)
-    @data = {}
-    @content_offset = 0
+  # @return [Integer] Position of the first content line in the input data
+  # following the header.
+  def parse(input)
     @last_tag = nil
     @empty_lines = 0
 
@@ -41,10 +41,12 @@ class MetaHeader
       input = StringIO.new input.encode universal_newline: true
     end
 
+    content_offset = 0
     input.each_line {|line|
-      break unless parse line
-      @content_offset = input.pos
+      break unless read_line line
+      content_offset = input.pos
     }
+    content_offset
   end
 
   # Returns the value of a tag by its name, or nil if not found.
@@ -169,7 +171,7 @@ private
     (?:\s*(?<value>[^\n]+))?
     \Z/x.freeze
 
-  def parse(line)
+  def read_line(line)
     line.chomp!
     line.encode! Encoding::UTF_8, invalid: :replace
 
