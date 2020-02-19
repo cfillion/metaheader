@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = "metaheader"
   spec.version       = MetaHeader::VERSION
   spec.authors       = ["cfillion"]
-  spec.email         = ["metaheader@cfillion.tk"]
+  spec.email         = ["metaheader@cfillion.ca"]
   spec.summary       = %q{Parser for metadata headers in plain-text files}
   spec.homepage      = "https://github.com/cfillion/metaheader"
   spec.license       = "LGPL-3.0+"
