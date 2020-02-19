@@ -216,4 +216,10 @@ class TestParser < MiniTest::Test
     mh = MetaHeader.new "\xff\xfe@a b\n"
     assert_equal 'b', mh[:a]
   end
+
+  def test_content_offset
+    input = "@hello\n@world\n\nafter"
+    mh = MetaHeader.new input
+    assert_equal input.index("after"), mh.content_offset
+  end
 end

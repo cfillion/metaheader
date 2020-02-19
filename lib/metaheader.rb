@@ -12,6 +12,10 @@ class MetaHeader
   # @return [Boolean]
   attr_accessor :strict
 
+  # Position of the first content line in the input data after the header.
+  # @return [Integer]
+  attr_reader :content_offset
+
   # Create a new instance from the contents of a file.
   # @param path [String] path to the file to be read
   # @return [MetaHeader]
@@ -35,7 +39,7 @@ class MetaHeader
   def initialize(input)
     @strict = false
     @data = {}
-
+    @content_offset = 0
     @last_tag = nil
     @empty_lines = 0
 
@@ -43,7 +47,10 @@ class MetaHeader
       input = StringIO.new input.encode universal_newline: true
     end
 
-    input.each_line {|line| break unless parse line }
+    input.each_line {|line|
+      break unless parse line
+      @content_offset = input.pos
+    }
   end
 
   # Returns the value of a tag by its name, or nil if not found.
