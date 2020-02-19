@@ -7,28 +7,24 @@ class TestValidator < MiniTest::Test
 
   def test_unknown_strict
     mh = MetaHeader.new "@hello\n@WORLD"
-    mh.strict = true
-
-    actual = mh.validate Hash.new
-    assert_equal ["unknown tag 'hello'", "unknown tag 'WORLD'"], actual
+    errors = mh.validate Hash.new, true
+    assert_equal ["unknown tag 'hello'", "unknown tag 'WORLD'"], errors
   end
 
   def test_unknown_tolerant
     mh = MetaHeader.new "@hello\n@world"
-    refute mh.strict
-
-    assert_nil mh.validate(Hash.new)
+    assert_nil mh.validate(Hash.new, false)
   end
 
   def test_strict_optional
-    mh = MetaHeader.new "@hello"
-    mh.strict = true
-
-    actual = mh.validate \
+    rules = {
       hello: MetaHeader::OPTIONAL,
-      world: MetaHeader::OPTIONAL
+      world: MetaHeader::OPTIONAL,
+    }
 
-    assert_nil actual
+    mh = MetaHeader.new "@hello"
+    errors = mh.validate rules, true
+    assert_nil errors
   end
 
   def test_required

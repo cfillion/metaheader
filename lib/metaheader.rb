@@ -7,11 +7,6 @@ class MetaHeader
   SINGLELINE = Object.new.freeze
   VALUE = Object.new.freeze
 
-  # Whether to fail validation if unknown tags are encoutered.
-  # @see #validate
-  # @return [Boolean]
-  attr_accessor :strict
-
   # Position of the first content line in the input data after the header.
   # @return [Integer]
   attr_reader :content_offset
@@ -37,7 +32,6 @@ class MetaHeader
   # Parse every tags found in input up to the first newline.
   # @param input [String, IO, StringIO]
   def initialize(input)
-    @strict = false
     @data = {}
     @content_offset = 0
     @last_tag = nil
@@ -119,16 +113,17 @@ class MetaHeader
   #     hello: [MetaHeader::REQUIRED, MetaHeader::SINGLELINE, /\d/],
   #     chunky: proc {|value| 'not bacon' unless value == 'bacon' }
   # @param rules [Hash] tag_name => rule or array_of_rules
+  # @param strict [Boolean] Whether to fail validation if unknown tags are encoutered.
   # @return [Array, nil] error list or nil
   # @see BOOLEAN
   # @see OPTIONAL
   # @see REQUIRED
   # @see SINGLELINE
   # @see VALUE
-  def validate(rules)
+  def validate(rules, strict = false)
     errors = Array.new
 
-    if @strict
+    if strict
       @data.each {|key, tag|
         errors << "unknown tag '%s'" % tag.name unless rules.has_key? key
       }
