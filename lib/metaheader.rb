@@ -43,8 +43,8 @@ class MetaHeader
 
     content_offset = 0
     input.each_line {|line|
-      break unless read_line line
       content_offset = input.pos
+      break unless read_line line
     }
     content_offset
   end

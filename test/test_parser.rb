@@ -208,7 +208,7 @@ class TestParser < MiniTest::Test
 
   def test_content_offset
     mh = MetaHeader.new
-    input = "@hello\n@world\n\nafter"
+    input = "# @hello\n# @world\n\nafter"
     content_offset = mh.parse input
     assert_equal input.index("after"), content_offset
   end
