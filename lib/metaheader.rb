@@ -56,8 +56,9 @@ class MetaHeader
 
     content_offset = 0
     input.each_line do |line|
-      continue = read_line line
-      content_offset += line.size + $/.size if continue || line.empty?
+      full_line_size = line.size # parse_line can trim the line
+      continue = parse_line line
+      content_offset += full_line_size if continue || line.empty?
       break unless continue
     end
     content_offset
@@ -182,7 +183,7 @@ private
     (?:\s*(?<value>[^\n]+))?
     \Z/x.freeze
 
-  def read_line(line)
+  def parse_line(line)
     line.chomp!
     line.encode! Encoding::UTF_8, invalid: :replace
 

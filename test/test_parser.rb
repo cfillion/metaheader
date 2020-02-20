@@ -208,14 +208,14 @@ class TestParser < MiniTest::Test
 
   def test_content_offset
     mh = MetaHeader.new
-    input = "@hello\n@world s\n\nafter"
+    input = "@hello\n@world s\n\nafter\n"
     content_offset = mh.parse input
     assert_equal input.index('after'), content_offset
   end
 
   def test_content_offset_decorated
     mh = MetaHeader.new
-    input = "# @hello\n# @world\n\nafter"
+    input = "# @hello\n# @world\n\nafter\n"
     content_offset = mh.parse input
     assert_equal input.index('after'), content_offset
   end
@@ -223,6 +223,13 @@ class TestParser < MiniTest::Test
   def test_content_offset_unicode
     mh = MetaHeader.new
     input = "@lang русский\n\nafter"
+    content_offset = mh.parse input
+    assert_equal input.index('after'), content_offset
+  end
+
+  def test_content_offset_trailing_space
+    mh = MetaHeader.new
+    input = "@foo\x20\x20\n  bar\n\nafter\n"
     content_offset = mh.parse input
     assert_equal input.index('after'), content_offset
   end
