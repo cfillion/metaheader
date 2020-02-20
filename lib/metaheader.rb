@@ -44,8 +44,8 @@ class MetaHeader
 
   # Parse every tags found in the input up to the first newline.
   # @param input [String, IO, StringIO]
-  # @return [Integer] Position of the first content line in the input data
-  # following the header.
+  # @return [Integer] Character position of the first content line in the input
+  # data following the header.
   def parse(input)
     if input.is_a? String
       input = StringIO.new input.encode universal_newline: true
@@ -55,10 +55,11 @@ class MetaHeader
     @empty_lines = 0
 
     content_offset = 0
-    input.each_line {|line|
-      content_offset = input.pos
-      break unless read_line line
-    }
+    input.each_line do |line|
+      continue = read_line line
+      content_offset += line.size + $/.size if continue || line.empty?
+      break unless continue
+    end
     content_offset
   end
 
