@@ -1,5 +1,7 @@
 require 'metaheader/version'
 
+require 'stringio'
+
 # Parser for metadata header in plain-text files
 # @example
 #   mh = MetaHeader.parse '@hello world'
