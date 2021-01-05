@@ -1,7 +1,8 @@
 # Parser for metadata header in plain-text files
 
 [![Gem Version](https://badge.fury.io/rb/metaheader.svg)](http://badge.fury.io/rb/metaheader)
-[![Build Status](https://travis-ci.org/cfillion/metaheader.svg?branch=master)](https://travis-ci.org/cfillion/metaheader)
+[![Test status](https://github.com/cfillion/metaheader/workflows/test/badge.svg)](https://github.com/cfillion/metaheader/actions)
+[![Donate](https://www.paypalobjects.com/webstatic/en_US/btn/btn_donate_74x21.png)](https://reapack.com/donate)
 
 ## Syntax
 
